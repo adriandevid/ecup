@@ -1,0 +1,33 @@
+{
+  "name": "futchamp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:setup": "node -e \"require('fs').readFileSync('sql/schema.sql','utf8').split(';').forEach(s=>s.trim()&&require('child_process').execSync('psql '+process.env.DATABASE_URL+' -c \"'+s.trim().replace(/\"/g,'\\\\\"')+'\"',{stdio:'inherit'}))\""
+  },
+  "dependencies": {
+    "next": "15.3.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "pg": "^8.13.1",
+    "jose": "^5.9.6",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/pg": "^8.11.10",
+    "@types/bcryptjs": "^2.4.6",
+    "typescript": "^5",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.2"
+  }
+}
