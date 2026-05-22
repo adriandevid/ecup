@@ -29,7 +29,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpenState] = useState(false);
-  const toastTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const toastTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const storedToken = getStoredToken();

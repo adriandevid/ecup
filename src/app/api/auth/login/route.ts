@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const token = await signToken({ userId: user.id, username: user.username, name: user.name });
 
-    const { password: _pw, ...safeUser } = user;
+    const { ...safeUser } = user;
     return NextResponse.json({ token, user: safeUser });
   } catch (err) {
     console.error('Login error:', err);
