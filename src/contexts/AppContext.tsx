@@ -11,12 +11,15 @@ interface AppContextType {
   queryLogs: QueryLog[];
   token: string | null;
   isModalOpen: boolean;
+  isUpdateProfileModalOpen: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
   switchTab: (tab: TabId) => void;
   showToast: (title: string, message: string, type: ToastState['type']) => void;
   addQueryLog: (action: string, query: string) => void;
   setModalOpen: (open: boolean) => void;
+  setUpdateProfileIsModalOpenState: (open: boolean) => void;
+  setCurrentUser: (currentUser: User | null) => void;
   clearLogs: () => void;
 }
 
@@ -29,6 +32,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpenState] = useState(false);
+  const [isUpdateProfileModalOpen, setUpdateProfileIsModalOpenState] = useState(false);
   const toastTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -107,8 +111,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      currentUser, activeTab, toast, queryLogs, token, isModalOpen,
-      login, logout, switchTab, showToast, addQueryLog, setModalOpen, clearLogs,
+      currentUser, activeTab, toast, queryLogs, token, isModalOpen, isUpdateProfileModalOpen,
+      login, logout, switchTab, showToast, addQueryLog, setModalOpen, clearLogs, setUpdateProfileIsModalOpenState, setCurrentUser
     }}>
       {children}
     </AppContext.Provider>

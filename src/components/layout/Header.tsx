@@ -11,7 +11,7 @@ const NAV_ITEMS: { id: TabId; label: string; icon: string }[] = [
 ];
 
 export function Header() {
-  const { currentUser, activeTab, switchTab, logout } = useApp();
+  const { currentUser, activeTab, switchTab, logout, setUpdateProfileIsModalOpenState } = useApp();
 
   return (
     <header className="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-40">
@@ -53,7 +53,7 @@ export function Header() {
         <div className="flex items-center space-x-4">
           {currentUser ? (
             <>
-              <div className="flex items-center space-x-3 group">
+              <div className="flex items-center space-x-3 group" onClick={() => setUpdateProfileIsModalOpenState(true)}>
                 <img
                   className="h-9 w-9 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/80 transition"
                   src={currentUser.photo_url}

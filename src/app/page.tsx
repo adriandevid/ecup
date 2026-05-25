@@ -10,6 +10,7 @@ import { ChampionshipsTab } from '@/components/championships/ChampionshipsTab';
 import { PlayersTab } from '@/components/players/PlayersTab';
 import { ConsoleTab } from '@/components/console/ConsoleTab';
 import { CreateChampionshipModal } from '@/components/championships/CreateChampionshipModal';
+import UpdateProfile from '@/components/auth/updateProfileModal';
 
 function AppContent() {
   const { currentUser, activeTab } = useApp();
@@ -33,6 +34,7 @@ function AppContent() {
       </main>
 
       <CreateChampionshipModal />
+      <UpdateProfile />
 
       <footer className="bg-slate-950 border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 space-y-2 mt-auto">
         <p>
