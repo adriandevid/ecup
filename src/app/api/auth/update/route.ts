@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import { query, queryOne } from '@/lib/db';
-import { signToken } from '@/lib/jwt';
 import { User } from '@/types';
 
 export async function PUT(req: NextRequest) {

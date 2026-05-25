@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function UpdateProfile() {
-    const { isUpdateProfileModalOpen, currentUser, showToast, switchTab, addQueryLog, setUpdateProfileIsModalOpenState, setCurrentUser } = useApp();
+    const { isUpdateProfileModalOpen, currentUser, showToast, addQueryLog, setUpdateProfileIsModalOpenState, setCurrentUser } = useApp();
     const [loading, setLoading] = useState(false);
 
     const [regName, setRegName] = useState(currentUser?.name);
