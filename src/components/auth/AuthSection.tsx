@@ -60,21 +60,21 @@ export function AuthSection() {
     }
   }
 
-  async function handleLoadDemo() {
-    setLoading(true);
-    try {
-      const data = await apiClient<{ token: string; user: User }>('/api/players/demo', {
-        method: 'POST',
-      });
-      addQueryLog('LOAD DEMO DATA', 'Cadastrados 8 atletas profissionais no PostgreSQL para testes.');
-      showToast('Demonstração Pronta', '8 craques cadastrados! Logado como Lionel Messi.', 'success');
-      login(data.token, data.user);
-    } catch (err) {
-      showToast('Erro Demo', (err as Error).message, 'error');
-    } finally {
-      setLoading(false);
-    }
-  }
+  // async function handleLoadDemo() {
+  //   setLoading(true);
+  //   try {
+  //     const data = await apiClient<{ token: string; user: User }>('/api/players/demo', {
+  //       method: 'POST',
+  //     });
+  //     addQueryLog('LOAD DEMO DATA', 'Cadastrados 8 atletas profissionais no PostgreSQL para testes.');
+  //     showToast('Demonstração Pronta', '8 craques cadastrados! Logado como Lionel Messi.', 'success');
+  //     login(data.token, data.user);
+  //   } catch (err) {
+  //     showToast('Erro Demo', (err as Error).message, 'error');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   const activeBtnCls = 'w-1/2 pb-3 font-bold text-center border-b-2 border-emerald-500 text-emerald-400 text-lg';
   const inactiveBtnCls = 'w-1/2 pb-3 font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-lg transition';
