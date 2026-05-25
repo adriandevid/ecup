@@ -11,6 +11,7 @@ import { PlayersTab } from '@/components/players/PlayersTab';
 import { ConsoleTab } from '@/components/console/ConsoleTab';
 import { CreateChampionshipModal } from '@/components/championships/CreateChampionshipModal';
 import UpdateProfile from '@/components/auth/updateProfileModal';
+import ChatModal from '@/components/chat/chatModal';
 
 function AppContent() {
   const { currentUser, activeTab } = useApp();
@@ -35,7 +36,8 @@ function AppContent() {
 
       <CreateChampionshipModal />
       <UpdateProfile />
-
+      <ChatModal />
+      
       <footer className="bg-slate-950 border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 space-y-2 mt-auto">
         <p>
           Desenvolvido com <i className="fa-solid fa-heart text-rose-500 animate-pulse" /> e PostgreSQL.
