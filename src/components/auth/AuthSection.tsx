@@ -120,10 +120,10 @@ export function AuthSection() {
               <span className="flex-shrink mx-4 text-slate-500 text-xs">Ou teste rápido</span>
               <div className="flex-grow border-t border-slate-700" />
             </div>
-            <button type="button" onClick={handleLoadDemo} disabled={loading}
+            {/* <button type="button" onClick={handleLoadDemo} disabled={loading}
               className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-2 px-4 rounded-xl transition text-sm">
               <i className="fa-solid fa-database mr-2" />Carregar 8 Jogadores Demo e Entrar
-            </button>
+            </button> */}
           </form>
         )}
 
