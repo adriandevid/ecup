@@ -19,7 +19,7 @@ export function Toast() {
 
   return (
     <div
-      className={`fixed bottom-5 right-5 z-50 bg-slate-800 border border-slate-700/80 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-300 max-w-md ${
+      className={`fixed top-5 right-[50%] z-50 bg-slate-800 border border-slate-700/80 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-300 max-w-md ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'
       }`}
     >

@@ -1,31 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useApp } from "@/contexts/AppContext";
-import { apiClient } from "@/lib/api";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { apiClient, getStoredToken } from "@/lib/api";
+import { useEffect, useState } from "react";
 
 export default function ChatModal() {
-    const { isModalMessage, messagesReceiveds, setModalMessage, socket, currentUser } = useApp();
+    const { isModalMessage, messagesReceiveds, showToast, setMessagesReceiveds, setModalMessage, socket, currentUser } = useApp();
     const [message, setMessage] = useState<string | undefined>();
     const [messages, setMessages] = useState<any[]>([]);
-    const router = useRouter();
-    const messagesRef = useRef<any | null>(null);
+
+    const [loading, isLoading] = useState<boolean>(false);
+    const [loadingSendMessage, isLoadingSendMessage] = useState<boolean>(false);
 
     const getAll = async () => {
+        isLoading(true);
+
         const response = await apiClient<any[]>('/api/message/all', {
             method: 'GET'
         });
 
         setMessages(response);
+        isLoading(false);
     }
 
     const sendMessage = async (message: string) => {
-        await apiClient<any>('/api/message', {
-            method: 'POST',
-            body: JSON.stringify({ message }),
-        });
-        await getAll();
+        const storedToken = getStoredToken();
+        if (socket && storedToken != null) {
+            socket.emit("all-messages", JSON.stringify({ message, token: storedToken }),);
+        }
+
         setMessage("");
     }
 
@@ -34,20 +38,49 @@ export default function ChatModal() {
     }, [])
 
     useEffect(function () {
+        setMessagesReceiveds([]);
+    }, [isModalMessage])
+
+    useEffect(function () {
+        if (socket) {
+            socket.on("load-messages", (msg) => {
+                isLoadingSendMessage(msg == "true");
+            })
+        }
+    }, [socket])
+
+    useEffect(function () {
         if (messagesReceiveds.length > 0) {
+            if (!isModalMessage) {
+                showToast(`Mensagem`, `Mensagem de ${messagesReceiveds[0].user.name}`, 'info');
+            }
+
             setMessages([
+                ...messages,
                 ...messagesReceiveds
             ]);
         }
     }, [messagesReceiveds])
 
-    useEffect(function () {
-        var messagesElement: any = document.getElementById("messages");
+    const scrollToBottom = () => {
+        const messagesElement = document.getElementById("messages");
 
         if (messagesElement != null && messagesElement != undefined) {
-            messagesElement.scroll(0, 1000);
+            messagesElement.scroll(0, messagesElement.scrollHeight + 200);
         }
+    }
+
+    useEffect(function () {
+        scrollToBottom();
     }, [isModalMessage, messages])
+
+    useEffect(function () {
+        scrollToBottom();
+    }, [loading, loadingSendMessage])
+
+    useEffect(function () {
+        scrollToBottom();
+    }, [loadingSendMessage])
 
     return (
         <>
@@ -105,6 +138,39 @@ export default function ChatModal() {
                                             )
                                         })
                                     }
+                                    {
+                                        loading && (
+                                            <div className="w-full flex flex-row justify-center">
+                                                <div className="newtons-cradle">
+                                                    <div className="newtons-cradle__dot"></div>
+                                                    <div className="newtons-cradle__dot"></div>
+                                                    <div className="newtons-cradle__dot"></div>
+                                                    <div className="newtons-cradle__dot"></div>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+
+                                    {
+                                        loadingSendMessage && (
+                                            <div className="flex flex-row gap-4 items-center justify-end">
+                                                <div className="newtons-cradle">
+                                                    <div className="newtons-cradle__dot"></div>
+                                                    <div className="newtons-cradle__dot"></div>
+                                                    <div className="newtons-cradle__dot"></div>
+                                                    <div className="newtons-cradle__dot"></div>
+                                                </div>
+
+                                                <img
+                                                    className="h-9 w-9 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/80 transition"
+                                                    src={currentUser?.photo_url}
+                                                    alt={currentUser?.photo_url}
+                                                    onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }}
+                                                />
+
+                                            </div>
+                                        )
+                                    }
                                 </div>
                                 <textarea
                                     rows={4}
@@ -115,28 +181,35 @@ export default function ChatModal() {
                                     placeholder="ex: messagem" />
                                 <button
                                     type="button"
-                                    // disabled={loading}
+                                    disabled={loadingSendMessage || loading}
                                     onClick={async () => {
                                         if (message) {
                                             await sendMessage(message);
                                         }
                                     }}
                                     className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20">
-                                    <i className="fa-solid fa-send mr-2" />Enviar Mensagem
+                                    <i className="fa-solid fa-send mr-2" />{loadingSendMessage ? "Enviando Mensagem..." : "Enviar Mensagem"}
                                 </button>
                             </form>
                         </div>
                     </div>
                 )
             }
-            <button
-                type="button"
-                // disabled={loading}
-                onClick={() => setModalMessage(true)}
-                className="w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-white font-bold p-6 py-8 rounded-full transition shadow-lg shadow-emerald-500/20 fixed bottom-20 right-10 flex flex-row justify-center items-center"
-            >
-                <i className="fa-solid fa-lg fa-message" />
-            </button>
+            <div className="fixed bottom-20 right-10">
+                <button
+                    type="button"
+                    // disabled={loading}
+                    onClick={() => setModalMessage(true)}
+                    className="w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-white font-bold p-6 py-8 rounded-full transition shadow-lg shadow-emerald-500/20 flex flex-row justify-center items-center relative"
+                >
+                    {
+                        messagesReceiveds.length > 0 ?
+                            <span className="w-6 h-6 bg-red-500 absolute top-[-3px] left-[-3px] rounded-full text-[10px] flex flex-row items-center justify-center">+{messagesReceiveds.length}</span> :
+                            <></>
+                    }
+                    <i className="fa-solid fa-lg fa-message" />
+                </button>
+            </div>
         </>
     )
 }

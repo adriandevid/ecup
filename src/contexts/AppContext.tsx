@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
@@ -126,12 +127,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(function () {
     if (socket) {
       socket.on("all-messages", (msg) => {
-        setMessagesReceiveds(msg);
+        setMessagesReceiveds([
+          ...messagesReceiveds,
+          JSON.parse(msg)
+        ]);
       })
     }
   }, [socket])
   useEffect(function () {
-    const newSocket = io("http://localhost:3000");
+    const storedToken = getStoredToken();
+
+    const newSocket = io(`${document.location.href}?token=${storedToken}`);
 
     setSocket(newSocket);
 
