@@ -38,6 +38,12 @@ CREATE TABLE IF NOT EXISTS matches (
     next_match_id   INTEGER REFERENCES matches(id)
 );
 
+CREATE TABLE IF NOT EXISTS "messages" (
+    id              SERIAL PRIMARY KEY,
+    "message"       VARCHAR(200) NOT NULL,
+    user_id    INTEGER REFERENCES users(id)
+);
+
 -- Índices para melhorar performance
 CREATE INDEX IF NOT EXISTS idx_matches_championship ON matches(championship_id);
 CREATE INDEX IF NOT EXISTS idx_championship_players_champ ON championship_players(championship_id);

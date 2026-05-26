@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { User, TabId, ToastState, QueryLog } from '@/types';
 import { getStoredToken } from '@/lib/api';
+import io, { Socket } from 'socket.io-client';
 
 interface AppContextType {
   currentUser: User | null;
@@ -12,6 +14,14 @@ interface AppContextType {
   token: string | null;
   isModalOpen: boolean;
   isUpdateProfileModalOpen: boolean;
+  isModalMessage: boolean;
+  socket: Socket | undefined;
+  messagesReceiveds: any[];
+
+  setSocket: (socket: Socket | undefined) => void;
+  setMessagesReceiveds: (messages: any[]) => void;
+  setModalMessage: (open: boolean) => void;
+
   login: (token: string, user: User) => void;
   logout: () => void;
   switchTab: (tab: TabId) => void;
@@ -34,6 +44,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isModalOpen, setIsModalOpenState] = useState(false);
   const [isUpdateProfileModalOpen, setUpdateProfileIsModalOpenState] = useState(false);
   const toastTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isModalMessage, setModalMessage] = useState(false);
+  const [messagesReceiveds, setMessagesReceiveds] = useState<any[]>([]);
+
 
   useEffect(() => {
     const storedToken = getStoredToken();
@@ -75,7 +88,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('futchamp_token');
     }
-    
+
     setToken(null);
     setCurrentUser(null);
     setActiveTab('auth');
@@ -109,10 +122,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setQueryLogs([]);
   }, []);
 
+  const [socket, setSocket] = useState<Socket | undefined>();
+
+  useEffect(function () {
+    if (socket) {
+      socket.on("all-messages", (msg) => {
+        setMessagesReceiveds([
+          ...messagesReceiveds,
+          JSON.parse(msg)
+        ]);
+      })
+    }
+  }, [socket])
+  useEffect(function () {
+    const storedToken = getStoredToken();
+
+    const newSocket = io(`${document.location.href}?token=${storedToken}`);
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    }
+  }, []);
+
   return (
     <AppContext.Provider value={{
-      currentUser, activeTab, toast, queryLogs, token, isModalOpen, isUpdateProfileModalOpen,
-      login, logout, switchTab, showToast, addQueryLog, setModalOpen, clearLogs, setUpdateProfileIsModalOpenState, setCurrentUser
+      currentUser, activeTab, toast, queryLogs, token, isModalOpen, isUpdateProfileModalOpen, isModalMessage, socket, messagesReceiveds,
+      login, logout, switchTab, showToast, addQueryLog, setModalOpen, setModalMessage, clearLogs, setUpdateProfileIsModalOpenState, setCurrentUser, setSocket, setMessagesReceiveds
     }}>
       {children}
     </AppContext.Provider>
