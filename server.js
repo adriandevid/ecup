@@ -39,6 +39,11 @@ app.prepare().then(() => {
             const message = JSON.parse(msg);
             const payload = await verifyToken(message.token);
 
+            if(message.message.length > 200) {
+                socket.emit("load-messages", "false");
+                return;
+            }
+
             const pool = new Pool({
                 connectionString: process.env.DATABASE_URL,
                 ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,

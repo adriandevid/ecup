@@ -114,7 +114,7 @@ export default function ChatModal() {
                                             if (x.user_id == currentUser?.id) {
                                                 return (
                                                     <div key={i} className="flex flex-row gap-4 items-center justify-end">
-                                                        <p>{x.message}</p>
+                                                        <p className="max-w-[190px]" style={{ lineBreak: 'anywhere' }}>{x.message}</p>
                                                         <img
                                                             className="h-9 w-9 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/80 transition"
                                                             src={x.user.photo_url}
@@ -133,7 +133,7 @@ export default function ChatModal() {
                                                         alt={x.user.photo_url}
                                                         onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }}
                                                     />
-                                                    <p>{x.message}</p>
+                                                    <p className="max-w-[100px]" style={{ lineBreak: 'anywhere' }}>{x.message}</p>
                                                 </div>
                                             )
                                         })
@@ -173,8 +173,8 @@ export default function ChatModal() {
                                     }
                                 </div>
                                 <textarea
-                                    rows={4}
                                     value={message}
+                                    maxLength={200}
                                     onChange={(e) => setMessage(e.target.value)}
                                     // onChange={e => setRegDesc(e.target.value)}
                                     className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
