@@ -36,7 +36,11 @@ function AppContent() {
 
       <CreateChampionshipModal />
       <UpdateProfile />
-      <ChatModal />
+      {
+        currentUser && (
+          <ChatModal />
+        )
+      }
       
       <footer className="bg-slate-950 border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 space-y-2 mt-auto">
         <p>
