@@ -102,7 +102,7 @@ export default function ChatModal() {
 
                             <form
                                 // onSubmit={handleSubmit} 
-                                className="py-10 px-10 flex flex-col gap-5 max-h-[85rem] overflow overflow-x-hidden"
+                                className="py-10 px-4 flex flex-col gap-5 max-h-[85rem] overflow overflow-x-hidden"
                             >
                                 <div
                                     id="messages"
