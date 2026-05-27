@@ -137,7 +137,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(function () {
     const storedToken = getStoredToken();
 
-    const newSocket = io(`${document.location.href}?token=${storedToken}`);
+    const newSocket = io(`ws://${process.env.NEXT_PUBLIC_WS_URL}/?token=${storedToken}`, {
+      transports: ["websocket", "polling"]
+    });
 
     setSocket(newSocket);
 
