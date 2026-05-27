@@ -102,12 +102,11 @@ export default function ChatModal() {
 
                             <form
                                 // onSubmit={handleSubmit} 
-                                className="py-10 px-10 flex flex-col gap-5"
+                                className="py-10 px-4 flex flex-col gap-5 max-h-[85rem] overflow overflow-x-hidden"
                             >
-                                <p className="bg-red-600 p-2 rounded-lg text-sm">Funcionalidade em desenvolvimento</p>
                                 <div
                                     id="messages"
-                                    className="flex flex-col gap-6 max-h-[400px] overflow overflow-x-hidden bg-slate-900 py-10 px-4 rounded-lg"
+                                    className="flex flex-col gap-6 max-h-[300px] overflow overflow-x-hidden bg-slate-900 py-10 px-4 rounded-lg"
                                 >
                                     {
                                         messages.map((x, i) => {
