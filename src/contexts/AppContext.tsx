@@ -138,8 +138,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const storedToken = getStoredToken();
 
     const newSocket = io(`${process.env.NEXT_PUBLIC_WS_URL}/?token=${storedToken}`, {
-      transports: ["websocket", "polling"],
-      path: "/"
+      transports: ["websocket", "polling"]
     });
 
     setSocket(newSocket);
