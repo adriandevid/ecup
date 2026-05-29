@@ -19,7 +19,8 @@ function PlayerImageTable({ row }: { row: Standings }) {
       className="w-7 h-7 rounded-lg object-cover"
       alt={`profile`}
       width={28}
-      unoptimized 
+      unoptimized
+      decoding='async'
       height={28}
       onErrorCapture={() => {
         setNoLoadImage(true);
@@ -37,7 +38,8 @@ function PlayerImageMatch({ photo_url }: { photo_url?: string | undefined }) {
       className="w-10 h-10 rounded-lg object-cover"
       alt={`profile`}
       width={40}
-      unoptimized 
+      unoptimized
+      decoding='async'
       height={40}
       onErrorCapture={() => {
         setNoLoadImage(true);
