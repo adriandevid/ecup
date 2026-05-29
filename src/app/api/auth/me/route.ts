@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { queryOne } from '@/lib/db';
 import { verifyToken } from '@/lib/jwt';
 import { User } from '@/types';
+import { cookies } from 'next/headers';
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
@@ -22,6 +23,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
     }
 
+    const cookieStore = await cookies();
+      
+    cookieStore.set('futchamp_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/',
+    });
+    
     return NextResponse.json({ user });
   } catch {
     return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
