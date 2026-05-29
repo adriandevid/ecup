@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query, queryOne } from '@/lib/db';
 import { signToken } from '@/lib/jwt';
-import { User } from '@/types';
+import { Permission, User } from '@/types';
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +32,12 @@ export async function POST(req: NextRequest) {
     );
 
     const user = rows[0];
+
+    await query<Permission>(
+      'INSERT INTO public.permissions (role_id, user_id) VALUES($1, $2) RETURNING *;',
+      [2, user.id]
+    );
+
     const token = await signToken({ userId: user.id, username: user.username, name: user.name });
 
     return NextResponse.json({ token, user }, { status: 201 });

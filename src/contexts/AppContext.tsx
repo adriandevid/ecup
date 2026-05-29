@@ -17,6 +17,7 @@ interface AppContextType {
   isModalMessage: boolean;
   socket: Socket | undefined;
   messagesReceiveds: any[];
+  roleId: number;
 
   setSocket: (socket: Socket | undefined) => void;
   setMessagesReceiveds: (messages: any[]) => void;
@@ -35,7 +36,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppProvider({ children, roleId }: { children: React.ReactNode, roleId: number }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('auth');
   const [toast, setToast] = useState<ToastState | null>(null);
@@ -150,7 +151,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      currentUser, activeTab, toast, queryLogs, token, isModalOpen, isUpdateProfileModalOpen, isModalMessage, socket, messagesReceiveds,
+      currentUser, activeTab, toast, queryLogs, token, isModalOpen, isUpdateProfileModalOpen, isModalMessage, socket, messagesReceiveds, roleId,
       login, logout, switchTab, showToast, addQueryLog, setModalOpen, setModalMessage, clearLogs, setUpdateProfileIsModalOpenState, setCurrentUser, setSocket, setMessagesReceiveds
     }}>
       {children}

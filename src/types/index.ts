@@ -77,3 +77,10 @@ export interface QueryLog {
   action: string;
   query: string;
 }
+
+
+export interface Permission {
+  id: number;
+  role_id: number;
+  user_id: number;
+}

@@ -44,6 +44,18 @@ CREATE TABLE IF NOT EXISTS "messages" (
     user_id    INTEGER REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS "roles" (
+    id              SERIAL PRIMARY KEY,
+	"role"          VARCHAR(200) NOT NULL,
+    user_id    		INTEGER REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS "permissions" (
+    id              SERIAL PRIMARY KEY,
+    role_id       	INTEGER REFERENCES roles(id),
+    user_id    		INTEGER REFERENCES users(id)
+);
+
 -- Índices para melhorar performance
 CREATE INDEX IF NOT EXISTS idx_matches_championship ON matches(championship_id);
 CREATE INDEX IF NOT EXISTS idx_championship_players_champ ON championship_players(championship_id);

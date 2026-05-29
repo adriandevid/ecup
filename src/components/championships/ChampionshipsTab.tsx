@@ -8,7 +8,7 @@ import { RoundRobinView } from './RoundRobinView';
 import { KnockoutView } from './KnockoutView';
 
 export function ChampionshipsTab() {
-  const { setModalOpen, showToast, addQueryLog } = useApp();
+  const { setModalOpen, showToast, addQueryLog, roleId } = useApp();
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [activeChamp, setActiveChamp] = useState<Championship | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,10 +66,14 @@ export function ChampionshipsTab() {
               </div>
             </div>
             <div className="flex items-center gap-3 w-full md:w-auto">
-              <button onClick={deleteChampionship}
-                className="flex-1 md:flex-none bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold px-4 py-2 rounded-xl transition text-sm">
-                <i className="fa-solid fa-trash mr-1" /> Deletar Torneio
-              </button>
+              {
+                roleId == 1 && (
+                  <button onClick={deleteChampionship}
+                    className="flex-1 md:flex-none bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold px-4 py-2 rounded-xl transition text-sm">
+                    <i className="fa-solid fa-trash mr-1" /> Deletar Torneio
+                  </button>
+                )
+              }
               <button onClick={() => setActiveChamp(null)}
                 className="flex-1 md:flex-none bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-4 py-2 rounded-xl transition text-sm">
                 <i className="fa-solid fa-chevron-left mr-1" /> Voltar à Lista

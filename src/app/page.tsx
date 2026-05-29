@@ -1,62 +1,34 @@
-'use client';
+import AppContent from "@/components/content";
+import { AppProvider } from "@/contexts/AppContext";
+import { queryOne } from "@/lib/db";
+import { verifyToken } from "@/lib/jwt";
+import { Permission } from "@/types";
+import { cookies } from "next/headers";
 
-import { AppProvider, useApp } from '@/contexts/AppContext';
-import { Header } from '@/components/layout/Header';
-import { MobileNav } from '@/components/layout/MobileNav';
-import { Toast } from '@/components/ui/Toast';
-import { AuthSection } from '@/components/auth/AuthSection';
-import { DashboardTab } from '@/components/dashboard/DashboardTab';
-import { ChampionshipsTab } from '@/components/championships/ChampionshipsTab';
-import { PlayersTab } from '@/components/players/PlayersTab';
-import { ConsoleTab } from '@/components/console/ConsoleTab';
-import { CreateChampionshipModal } from '@/components/championships/CreateChampionshipModal';
-import UpdateProfile from '@/components/auth/updateProfileModal';
-import ChatModal from '@/components/chat/chatModal';
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('futchamp_token');
 
-function AppContent() {
-  const { currentUser, activeTab } = useApp();
+  if (token) {
+    const payload = await verifyToken(token.value);
+    const permission = await queryOne<Permission>(
+      'SELECT id, role_id, user_id FROM permissions WHERE user_id = $1',
+      [payload.userId]
+    );
+
+    if(permission != null) {
+      return (
+        <AppProvider roleId={permission.role_id}>
+          <div className="text-slate-100 min-h-screen flex flex-col">
+            <AppContent />
+          </div>
+        </AppProvider>
+      );
+    }
+  }
 
   return (
-    <>
-      <Header />
-      <MobileNav />
-
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20 md:mb-8">
-        {!currentUser ? (
-          <AuthSection />
-        ) : (
-          <>
-            <div className={activeTab === 'dashboard'     ? '' : 'hidden'}><DashboardTab /></div>
-            <div className={activeTab === 'championships' ? '' : 'hidden'}><ChampionshipsTab /></div>
-            <div className={activeTab === 'profiles'      ? '' : 'hidden'}><PlayersTab /></div>
-            <div className={activeTab === 'console'       ? '' : 'hidden'}><ConsoleTab /></div>
-          </>
-        )}
-      </main>
-
-      <CreateChampionshipModal />
-      <UpdateProfile />
-      {
-        currentUser && (
-          <ChatModal />
-        )
-      }
-      
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 space-y-2 mt-auto">
-        <p>
-          Desenvolvido com <i className="fa-solid fa-heart text-rose-500 animate-pulse" /> e PostgreSQL.
-        </p>
-        <p className="font-mono">PostgreSQL Database Engine &copy; 2026 | FutChamp Inc.</p>
-      </footer>
-
-      <Toast />
-    </>
-  );
-}
-
-export default function Home() {
-  return (
-    <AppProvider>
+    <AppProvider roleId={0}>
       <div className="text-slate-100 min-h-screen flex flex-col">
         <AppContent />
       </div>

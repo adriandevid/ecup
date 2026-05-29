@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { signToken } from '@/lib/jwt';
 import { User } from '@/types';
+import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,16 @@ export async function POST(req: NextRequest) {
     const token = await signToken({ userId: user.id, username: user.username, name: user.name });
 
     const { ...safeUser } = user;
+
+    const cookieStore = await cookies();
+  
+    cookieStore.set('futchamp_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/',
+    });
+
     return NextResponse.json({ token, user: safeUser });
   } catch (err) {
     console.error('Login error:', err);
