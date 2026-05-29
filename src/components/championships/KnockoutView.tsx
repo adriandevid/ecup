@@ -67,12 +67,12 @@ export function KnockoutView({ champId, onChampionCrowned }: Props) {
         onChampionCrowned?.(res.champion);
 
         if(socket) {
-          var match = matches.filter(x => x.id == matchId)[0];
+          const match = matches.filter(x => x.id == matchId)[0];
           socket.emit('match-status', `${res.champion} conquistou o título do campeonato ${champInfo?.name} com o resultado final de ${match.home_score} a ${match.away_score}!`)
         }
       } else {
         if(socket) {
-          var match = matches.filter(x => x.id == matchId)[0];
+          const match = matches.filter(x => x.id == matchId)[0];
           socket.emit('match-status', `Resultado da partida entre ${match.home_name} e ${match.away_name} foi de ${match.home_score} a ${match.away_score}`)
         }
         showToast('Resultado Salvo', 'Vencedor avançado para próxima fase!', 'success');

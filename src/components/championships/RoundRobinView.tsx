@@ -66,7 +66,7 @@ export function RoundRobinView({ champId }: Props) {
       await loadMatches(selectedRound);
 
       if (socket) {
-        var match = matches.filter(x => x.id == matchId)[0];
+        const match = matches.filter(x => x.id == matchId)[0];
         socket.emit('match-status', `Resultado da partida entre ${match.home_name} e ${match.away_name} foi de ${match.home_score} a ${match.away_score}`)
       }
 
