@@ -10,7 +10,7 @@ import Image from 'next/image';
 interface Props {
   champId: number;
 }
-function PlayerImageTable({ row }: { row: any }) {
+function PlayerImageTable({ row }: { row: Standings }) {
   const [noLoadImage, setNoLoadImage] = useState<boolean>(false);
 
   return (
@@ -21,7 +21,7 @@ function PlayerImageTable({ row }: { row: any }) {
       width={28}
       unoptimized 
       height={28}
-      onErrorCapture={(e) => {
+      onErrorCapture={() => {
         setNoLoadImage(true);
       }}
     />
@@ -39,7 +39,7 @@ function PlayerImageMatch({ photo_url }: { photo_url?: string | undefined }) {
       width={40}
       unoptimized 
       height={40}
-      onErrorCapture={(e) => {
+      onErrorCapture={() => {
         setNoLoadImage(true);
       }}
     />

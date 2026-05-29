@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api';
 import { PlayerStats } from '@/types';
 import Image from 'next/image';
 
-function IconPlayer({ u } : { u: any }) {
+function IconPlayer({ u } : { u: PlayerStats }) {
   const [noLoadImage, setNoLoadImage] = useState<boolean>(false);
 
   return (
@@ -18,7 +18,7 @@ function IconPlayer({ u } : { u: any }) {
           width={64}
           height={64}
           alt={u.name}
-          onErrorCapture={(e) => {
+          onErrorCapture={() => {
             setNoLoadImage(true);
           }}
         />
