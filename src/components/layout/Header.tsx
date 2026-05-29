@@ -2,6 +2,7 @@
 
 import { useApp } from '@/contexts/AppContext';
 import { TabId } from '@/types';
+import Image from 'next/image';
 
 const NAV_ITEMS: { id: TabId; label: string; icon: string }[] = [
   { id: 'dashboard',     label: 'Início',      icon: 'fa-solid fa-house' },
@@ -54,11 +55,15 @@ export function Header() {
           {currentUser ? (
             <>
               <div className="flex items-center space-x-3 group" onClick={() => setUpdateProfileIsModalOpenState(true)}>
-                <img
+                <Image
                   className="h-9 w-9 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/80 transition"
                   src={currentUser.photo_url}
                   alt={currentUser.name}
-                  onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }}
+                  width={36}
+                  height={36}
+                  unoptimized
+                  decoding='async'
+                  // onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }}
                 />
                 <div className="hidden sm:block text-left">
                   <span className="block text-sm font-semibold text-white">{currentUser.name}</span>

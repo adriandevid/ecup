@@ -18,6 +18,8 @@ function IconPlayer({ u } : { u: PlayerStats }) {
           width={64}
           height={64}
           alt={u.name}
+          unoptimized
+          decoding='async'
           onErrorCapture={() => {
             setNoLoadImage(true);
           }}
