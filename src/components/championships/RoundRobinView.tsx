@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { Match, Standings } from '@/types';
+import { cn } from '@/lib/tailwindcss';
 
 interface Props {
   champId: number;
@@ -113,7 +114,18 @@ export function RoundRobinView({ champId }: Props) {
               {standings.map((row, pos) => {
                 const sg = row.goals_for - row.goals_against;
                 return (
-                  <tr key={row.pid} className="border-b border-slate-800 hover:bg-slate-800/50 transition">
+                  <tr 
+                    key={row.pid} 
+                    className={
+                      cn(
+                        "border-b border-slate-800 transition", 
+                        pos < 3 ? "hover:bg-green-300/50 bg-emerald-400/[.5]" : 
+                        pos >= (standings.length - 2) ?
+                        "hover:bg-red-300/50 bg-red-400/[.5]" :
+                        "hover:bg-slate-800/50"
+                      )
+                    }
+                  >
                     <td className="py-3 px-4 text-center font-bold text-slate-400">{pos + 1}</td>
                     <td className="py-3 px-4 font-semibold text-white">
                       <div className="flex items-center space-x-3">
