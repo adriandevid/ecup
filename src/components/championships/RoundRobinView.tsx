@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function RoundRobinView({ champId }: Props) {
-  const { showToast, addQueryLog } = useApp();
+  const { showToast, addQueryLog, socket } = useApp();
   const [standings, setStandings] = useState<Standings[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [maxRound, setMaxRound] = useState(1);
@@ -44,8 +44,10 @@ export function RoundRobinView({ champId }: Props) {
   async function saveScore(matchId: number) {
     const s = scores[matchId];
     if (!s) return;
+
     const home = parseInt(s.home);
     const away = parseInt(s.away);
+
     if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
       showToast('Erro de Placar', 'Digite um placar válido (zero ou maior).', 'error');
       return;
@@ -55,11 +57,19 @@ export function RoundRobinView({ champId }: Props) {
         method: 'PUT',
         body: JSON.stringify({ homeScore: home, awayScore: away }),
       });
+
       addQueryLog('UPDATE SCORE', `UPDATE matches SET home_score = ${home}, away_score = ${away}, played = true WHERE id = ${matchId}`);
       showToast('Resultado Salvo', 'A partida foi computada no banco!', 'success');
       setScores(prev => { const n = { ...prev }; delete n[matchId]; return n; });
+
       await loadStandings();
       await loadMatches(selectedRound);
+
+      if (socket) {
+        var match = matches.filter(x => x.id == matchId)[0];
+        socket.emit('match-status', `Resultado da partida entre ${match.home_name} e ${match.away_name} foi de ${match.home_score} a ${match.away_score}`)
+      }
+
     } catch (err) {
       showToast('Erro', (err as Error).message, 'error');
     }

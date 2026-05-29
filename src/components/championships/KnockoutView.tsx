@@ -24,7 +24,7 @@ function getRoundTitle(rIndex: number, total: number) {
 }
 
 export function KnockoutView({ champId, onChampionCrowned }: Props) {
-  const { showToast, addQueryLog } = useApp();
+  const { showToast, addQueryLog, socket } = useApp();
   const [matches, setMatches] = useState<Match[]>([]);
   const [champInfo, setChampInfo] = useState<Championship | null>(null);
   const [maxRound, setMaxRound] = useState(1);
@@ -37,6 +37,7 @@ export function KnockoutView({ champId, onChampionCrowned }: Props) {
         apiClient<{ matches: Match[]; maxRound: number }>(`/api/championships/${champId}/matches`),
         apiClient<{ championship: Championship }>(`/api/championships/${champId}`),
       ]);
+
       setMatches(matchData.matches);
       setMaxRound(matchData.maxRound);
       setChampInfo(champData.championship);
@@ -64,7 +65,16 @@ export function KnockoutView({ champId, onChampionCrowned }: Props) {
       if (res.champion) {
         showToast('Temos um Campeão!', `${res.champion} conquistou o título!`, 'success');
         onChampionCrowned?.(res.champion);
+
+        if(socket) {
+          var match = matches.filter(x => x.id == matchId)[0];
+          socket.emit('match-status', `${res.champion} conquistou o título do campeonato ${champInfo?.name} com o resultado final de ${match.home_score} a ${match.away_score}!`)
+        }
       } else {
+        if(socket) {
+          var match = matches.filter(x => x.id == matchId)[0];
+          socket.emit('match-status', `Resultado da partida entre ${match.home_name} e ${match.away_name} foi de ${match.home_score} a ${match.away_score}`)
+        }
         showToast('Resultado Salvo', 'Vencedor avançado para próxima fase!', 'success');
       }
       setScores(prev => { const n = { ...prev }; delete n[matchId]; return n; });
