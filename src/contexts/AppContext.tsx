@@ -137,15 +137,19 @@ export function AppProvider({ children, roleId }: { children: React.ReactNode, r
   }, [socket])
   useEffect(function () {
     const storedToken = getStoredToken();
+    
+    if(socket == undefined) {
+      const newSocket = io(`${process.env.NEXT_PUBLIC_WS_URL}/?token=${storedToken}`, {
+        transports: ["websocket", "polling"]
+      });
 
-    const newSocket = io(`${process.env.NEXT_PUBLIC_WS_URL}/?token=${storedToken}`, {
-      transports: ["websocket", "polling"]
-    });
-
-    setSocket(newSocket);
+      setSocket(newSocket);
+    }
 
     return () => {
-      newSocket.close();
+      if(socket) {
+        socket.close();
+      }
     }
   }, []);
 

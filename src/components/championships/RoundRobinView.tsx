@@ -5,9 +5,45 @@ import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { Match, Standings } from '@/types';
 import { cn } from '@/lib/tailwindcss';
+import Image from 'next/image';
 
 interface Props {
   champId: number;
+}
+function PlayerImageTable({ row }: { row: any }) {
+  const [noLoadImage, setNoLoadImage] = useState<boolean>(false);
+
+  return (
+    <Image
+      src={`${row.photo_url == undefined || (row.photo_url != undefined && !row.photo_url.includes('jpg') && !row.photo_url.includes('png') && !row.photo_url.includes('jpeg')) || noLoadImage ? '/images/default_icon.png' : row.photo_url}?v=${new Date().getTime()}`}
+      className="w-7 h-7 rounded-lg object-cover"
+      alt={`profile`}
+      width={28}
+      unoptimized 
+      height={28}
+      onErrorCapture={(e) => {
+        setNoLoadImage(true);
+      }}
+    />
+  )
+}
+
+function PlayerImageMatch({ photo_url }: { photo_url?: string | undefined }) {
+  const [noLoadImage, setNoLoadImage] = useState<boolean>(false);
+
+  return (
+    <Image
+      src={`${photo_url == undefined || (photo_url != undefined && !photo_url.includes('jpg') && !photo_url.includes('png') && !photo_url.includes('jpeg')) || noLoadImage ? '/images/default_icon.png' : photo_url}?v=${new Date().getTime()}`}
+      className="w-10 h-10 rounded-lg object-cover"
+      alt={`profile`}
+      width={40}
+      unoptimized 
+      height={40}
+      onErrorCapture={(e) => {
+        setNoLoadImage(true);
+      }}
+    />
+  )
 }
 
 export function RoundRobinView({ champId }: Props) {
@@ -114,23 +150,24 @@ export function RoundRobinView({ champId }: Props) {
               {standings.map((row, pos) => {
                 const sg = row.goals_for - row.goals_against;
                 return (
-                  <tr 
-                    key={row.pid} 
+                  <tr
+                    key={row.pid}
                     className={
                       cn(
-                        "border-b border-slate-800 transition", 
-                        pos < 3 ? "hover:bg-green-300/50 bg-emerald-400/[.5]" : 
-                        pos >= (standings.length - 2) ?
-                        "hover:bg-red-300/50 bg-red-400/[.5]" :
-                        "hover:bg-slate-800/50"
+                        "border-b border-slate-800 transition",
+                        pos < 3 ? "hover:bg-green-300/50 bg-emerald-400/[.5]" :
+                          pos >= (standings.length - 2) ?
+                            "hover:bg-red-300/50 bg-red-400/[.5]" :
+                            "hover:bg-slate-800/50"
                       )
                     }
                   >
                     <td className="py-3 px-4 text-center font-bold text-slate-400">{pos + 1}</td>
                     <td className="py-3 px-4 font-semibold text-white">
                       <div className="flex items-center space-x-3">
-                        <img src={row.photo_url} className="w-7 h-7 rounded-lg object-cover"
-                          onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/80x80/1e293b/a5b4fc?text=FC'; }} alt={row.name} />
+                        <PlayerImageTable row={row} />
+                        {/* <img src={row.photo_url} className="w-7 h-7 rounded-lg object-cover"
+                          onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/80x80/1e293b/a5b4fc?text=FC'; }} alt={row.name} /> */}
                         <span>{row.name}</span>
                       </div>
                     </td>
@@ -178,8 +215,9 @@ export function RoundRobinView({ champId }: Props) {
               </div>
               <div className="grid grid-cols-12 gap-3 items-center">
                 <div className="col-span-4 flex flex-col items-center text-center space-y-1">
-                  <img src={m.home_photo ?? ''} className="w-10 h-10 rounded-xl object-cover ring-2 ring-slate-800"
-                    onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }} alt="" />
+                  <PlayerImageMatch photo_url={m.home_photo} />
+                  {/* <img src={m.home_photo ?? ''} className="w-10 h-10 rounded-xl object-cover ring-2 ring-slate-800"
+                    onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }} alt="" /> */}
                   <span className="text-xs font-bold text-slate-200 line-clamp-1">{m.home_name}</span>
                 </div>
                 <div className="col-span-4 flex flex-col items-center justify-center">
@@ -208,8 +246,9 @@ export function RoundRobinView({ champId }: Props) {
                   )}
                 </div>
                 <div className="col-span-4 flex flex-col items-center text-center space-y-1">
-                  <img src={m.away_photo ?? ''} className="w-10 h-10 rounded-xl object-cover ring-2 ring-slate-800"
-                    onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }} alt="" />
+                  <PlayerImageMatch photo_url={m.away_photo} />
+                  {/* <img src={m.away_photo ?? ''} className="w-10 h-10 rounded-xl object-cover ring-2 ring-slate-800"
+                    onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }} alt="" /> */}
                   <span className="text-xs font-bold text-slate-200 line-clamp-1">{m.away_name}</span>
                 </div>
               </div>

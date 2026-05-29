@@ -24,10 +24,10 @@ export function Header() {
             <i className="fa-solid fa-ranking-star text-lg" />
           </div>
           <div>
-            <span className="text-xl font-extrabold tracking-wider bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              FutChamp
+            <span className="text-xl text-start font-extrabold tracking-wider bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              Ecup
             </span>
-            <span className="text-xs block text-slate-400 font-medium">PostgreSQL Edition</span>
+            <span className="text-xs block text-slate-400 font-medium">Eletronic Cup</span>
           </div>
         </button>
 
