@@ -46,8 +46,7 @@ CREATE TABLE IF NOT EXISTS "messages" (
 
 CREATE TABLE IF NOT EXISTS "roles" (
     id              SERIAL PRIMARY KEY,
-	"role"          VARCHAR(200) NOT NULL,
-    user_id    		INTEGER REFERENCES users(id)
+	"role"          VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "permissions" (
