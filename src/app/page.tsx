@@ -35,7 +35,7 @@ export default async function Home() {
         </div>
       </AppProvider>
     );
-  } catch (ex: any) {
+  } catch {
     return (
       <AppProvider roleId={0}>
         <div className="text-slate-100 min-h-screen flex flex-col">
