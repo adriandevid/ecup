@@ -6,7 +6,7 @@ import { apiClient } from '@/lib/api';
 import { PlayerStats } from '@/types';
 import Image from 'next/image';
 
-function IconPlayer({ u } : { u: PlayerStats }) {
+function IconPlayer({ u }: { u: PlayerStats }) {
   const [noLoadImage, setNoLoadImage] = useState<boolean>(false);
 
   return (

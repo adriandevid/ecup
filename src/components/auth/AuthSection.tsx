@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { User } from '@/types';
+import { cn } from '@/lib/tailwindcss';
 
 type AuthMode = 'login' | 'register';
 
@@ -20,6 +21,9 @@ export function AuthSection() {
   const [regPassword, setRegPassword] = useState('');
   const [regPhotoUrl, setRegPhotoUrl] = useState('');
   const [regDesc, setRegDesc] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+
+  const [recoverPassword, isRecoverPassword] = useState<boolean>(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -84,7 +88,7 @@ export function AuthSection() {
   return (
     <section className="max-w-md mx-auto my-12 bg-slate-800 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
-        <div className="flex border-b border-slate-700 mb-6">
+        <div className={cn("flex border-b border-slate-700 mb-6", recoverPassword ? "hidden" : "")}>
           <button onClick={() => setMode('login')} className={mode === 'login' ? activeBtnCls : inactiveBtnCls}>
             Entrar
           </button>
@@ -95,35 +99,61 @@ export function AuthSection() {
 
         {mode === 'login' && (
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1">Usuário</label>
-              <div className="relative">
-                <i className="fa-solid fa-user absolute left-3 top-3.5 text-slate-500" />
-                <input type="text" required value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
-                  className={inputCls} placeholder="ex: jgomez" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1">Senha</label>
-              <div className="relative">
-                <i className="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500" />
-                <input type="password" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
-                  className={inputCls} placeholder="••••••••" />
-              </div>
-            </div>
-            <button type="submit" disabled={loading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20">
-              <i className="fa-solid fa-right-to-bracket mr-2" />Acessar Sistema
-            </button>
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-slate-700" />
-              <span className="flex-shrink mx-4 text-slate-500 text-xs">Ou teste rápido</span>
-              <div className="flex-grow border-t border-slate-700" />
-            </div>
-            {/* <button type="button" onClick={handleLoadDemo} disabled={loading}
-              className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-2 px-4 rounded-xl transition text-sm">
-              <i className="fa-solid fa-database mr-2" />Carregar 8 Jogadores Demo e Entrar
-            </button> */}
+            {
+              recoverPassword ?
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">E-mail</label>
+                    <input type="email" required defaultValue={regEmail} onChange={e => setRegEmail(e.target.value)}
+                      className={inputNoPadCls} placeholder="ex: example@gmail.com"
+                      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                      title="Please enter a valid email address (e.g., name@example.com)"
+                    />
+                  </div>
+                  <button type="submit" disabled={loading}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20">
+                    <i className="fa-solid fa-user-plus mr-2" />Recuperar Senha
+                  </button>
+                </> :
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">Usuário</label>
+                    <div className="relative">
+                      <i className="fa-solid fa-user absolute left-3 top-3.5 text-slate-500" />
+                      <input type="text" required value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
+                        className={inputCls} placeholder="ex: jgomez" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">Senha</label>
+                    <div className="relative">
+                      <i className="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500" />
+                      <input type="password" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
+                        className={inputCls} placeholder="••••••••" />
+                    </div>
+                  </div>
+                  <button type="submit" disabled={loading}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20">
+                    <i className="fa-solid fa-right-to-bracket mr-2" />Acessar Sistema
+                  </button>
+                  <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-slate-700" />
+                    <span className="flex-shrink mx-4 text-slate-500 text-xs">Ou recuperar a senha</span>
+                    <div className="flex-grow border-t border-slate-700" />
+                  </div>
+                  <button type="button" disabled={loading} onClick={() => {
+                    if (loginUsername.length == 0) {
+                      showToast('Recuperação de Senha', "informe o login do usuário!", 'error');
+                      return;
+                    } else {
+                      isRecoverPassword(true);
+                    }
+                  }}
+                    className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-2 px-4 rounded-xl transition text-sm">
+                    <i className="fa-solid fa-user mr-2" />Recuperar Senha
+                  </button>
+                </>
+            }
           </form>
         )}
 

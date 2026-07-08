@@ -4,7 +4,7 @@ import { User } from '@/types';
 
 export async function PUT(req: NextRequest) {
   try {
-    const { id, name, username, photo_url, description } = await req.json();
+    const { id, name, username, photo_url, description, email } = await req.json();
 
     if (!name || !username) {
       return NextResponse.json({ error: 'Nome, usuário e senha são obrigatórios' }, { status: 400 });
@@ -23,17 +23,23 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Este nome de usuário já está em uso' }, { status: 409 });
     }
 
+    const existingEmail = await queryOne<User>('SELECT id FROM users WHERE email = $1 and id <> $2', [email, id]);
+    
+    if(existingEmail) {
+      return NextResponse.json({ error: 'Este email de usuário já está em uso' }, { status: 409 });
+    }
+
     const rows = await query<User>(
       `
         UPDATE users 
             SET username = $2,
                 name = $3,
                 photo_url = $4,
-                description = $5
-
+                description = $5,
+                email = $6
         WHERE id = $1 RETURNING *;
       `,
-      [id, cleanUsername, name.trim(), finalPhotoUrl, description?.trim() || '']
+      [id, cleanUsername, name.trim(), finalPhotoUrl, description?.trim() || '', email]
     );
 
     const user = rows[0];

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   try {
     const payload = await verifyToken(token);
     const user = await queryOne<User>(
-      'SELECT id, username, name, photo_url, description FROM users WHERE id = $1',
+      'SELECT id, username, name, photo_url, description, email FROM users WHERE id = $1',
       [payload.userId]
     );
 
