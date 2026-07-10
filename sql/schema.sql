@@ -55,6 +55,14 @@ CREATE TABLE IF NOT EXISTS "permissions" (
     user_id    		INTEGER REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS "reset_tokens" (
+	id serial not null primary key,
+	hash_code text not null,
+	expiration_date timestamp not null,
+	email text not null
+);
+
+
 -- Índices para melhorar performance
 CREATE INDEX IF NOT EXISTS idx_matches_championship ON matches(championship_id);
 CREATE INDEX IF NOT EXISTS idx_championship_players_champ ON championship_players(championship_id);

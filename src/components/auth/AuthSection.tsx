@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { User } from '@/types';
 import { cn } from '@/lib/tailwindcss';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 type AuthMode = 'login' | 'register';
 
@@ -25,6 +26,8 @@ export function AuthSection() {
 
   const [recoverPassword, isRecoverPassword] = useState<boolean>(false);
 
+  const searchParams = useSearchParams();
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -40,6 +43,26 @@ export function AuthSection() {
       showToast('Login Inválido', (err as Error).message, 'error');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function sendRecoverEmail() {
+    try {
+
+      setLoading(true);
+      setRegEmail("");
+
+      await apiClient('/api/auth/recover-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: regEmail }),
+      });
+      setLoading(false);
+      showToast('Email enviado', `Email de recuperação de senha enviado com sucesso (Atenção na caixa de spam)!`, 'success');
+      isRecoverPassword(false);
+    } catch(err) {
+      setLoading(false);
+      isRecoverPassword(true);
+      showToast('Envio de códio', "Já foi enviado um código para seu email!", 'error');
     }
   }
 
@@ -85,6 +108,9 @@ export function AuthSection() {
   const inputCls = 'w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500';
   const inputNoPadCls = 'w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500';
 
+  useEffect(function () {
+    console.log(searchParams.get('recorver-hashcode'));
+  }, [])
   return (
     <section className="max-w-md mx-auto my-12 bg-slate-800 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
@@ -110,7 +136,15 @@ export function AuthSection() {
                       title="Please enter a valid email address (e.g., name@example.com)"
                     />
                   </div>
-                  <button type="submit" disabled={loading}
+                  <button type="button" disabled={loading}
+                    onClick={async () => {
+                      if (regEmail.length == 0) {
+                        showToast('Recuperação de Senha', "informe o email do usuário!", 'error');
+                        return;
+                      }
+
+                      await sendRecoverEmail();
+                    }}
                     className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20">
                     <i className="fa-solid fa-user-plus mr-2" />Recuperar Senha
                   </button>
@@ -142,12 +176,7 @@ export function AuthSection() {
                     <div className="flex-grow border-t border-slate-700" />
                   </div>
                   <button type="button" disabled={loading} onClick={() => {
-                    if (loginUsername.length == 0) {
-                      showToast('Recuperação de Senha', "informe o login do usuário!", 'error');
-                      return;
-                    } else {
-                      isRecoverPassword(true);
-                    }
+                    isRecoverPassword(true);
                   }}
                     className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-2 px-4 rounded-xl transition text-sm">
                     <i className="fa-solid fa-user mr-2" />Recuperar Senha
