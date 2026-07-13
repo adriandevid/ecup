@@ -56,13 +56,13 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ id: champId }, { status: 201 });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar campeonato' }, { status: 500 });
   }
 }
 
 async function generateRoundRobin(champId: number, players: number[], return_rounds?: boolean | undefined) {
-  var list = [...players];
+  const list = [...players];
   if (list.length % 2 !== 0) list.push(0);
 
   const totalTeams = list.length;
