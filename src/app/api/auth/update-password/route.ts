@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "O código de solicitação de troca de senha não existe ou não é válido!"}, { status: 400 });
     }
 
-    if(reset_token != null && new Date() < new Date(reset_token.expiration_date)) {
+    if(reset_token != null && new Date() > new Date(reset_token.expiration_date)) {
         return NextResponse.json({ message: "O token referido já expirou, solicite novamente um token!"}, { status: 400 });
     }
 
