@@ -15,18 +15,19 @@ export async function POST(req: NextRequest) {
 
     const existing = await queryOne<{ id: number, expiration_date: string }| undefined | null>('SELECT id, expiration_date FROM reset_tokens WHERE email = $1  order by id desc;', [email]);
 
-    if(existing != null && new Date() > new Date(existing.expiration_date)) {
+    if(existing != null && new Date() < new Date(existing.expiration_date)) {
         return NextResponse.json({ message: "Existe um token válido que já foi enviado ao seu email!" }, { status: 400 });
     }
 
     const aleatoryHash = Math.random().toString(36).substring(2, 12);
 
     const date = new Date();
+
     date.setMinutes(date.getMinutes() + 5);
 
     await query<{ id: number, expiration_date: string, hash_code: string, email: string } | undefined | null>(
         'INSERT INTO public.reset_tokens(hash_code, expiration_date, email) VALUES($1, $2, $3)  RETURNING id, hash_code, expiration_date, email;',
-        [aleatoryHash, date, email]
+        [aleatoryHash, date.toUTCString(), email]
     );
 
 
