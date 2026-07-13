@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { User } from '@/types';
+import { cn } from '@/lib/tailwindcss';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 type AuthMode = 'login' | 'register';
 
@@ -20,6 +22,11 @@ export function AuthSection() {
   const [regPassword, setRegPassword] = useState('');
   const [regPhotoUrl, setRegPhotoUrl] = useState('');
   const [regDesc, setRegDesc] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+
+  const [recoverPassword, isRecoverPassword] = useState<boolean>(false);
+
+  const searchParams = useSearchParams();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -36,6 +43,52 @@ export function AuthSection() {
       showToast('Login Inválido', (err as Error).message, 'error');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleRecoveryPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if(passwordRecovery == confirmPasswordRecovery) {
+      try {
+        setLoading(true);
+        await apiClient('/api/auth/update-password', {
+          method: 'POST',
+          body: JSON.stringify({ password: passwordRecovery, confirmPassword: confirmPasswordRecovery, recover_hashcode: hashCode }),
+        });
+        
+        router.push(`/`, { scroll: false });
+        
+        setLoading(false);
+        showToast('Alteração de senha', "Senha alterada com sucesso!", "success");
+        recoveryPassword(false);
+      } catch(err: any) {
+        setLoading(false);
+        showToast('Alteração de senha', err.message, 'error');
+      }
+
+    } else {
+        showToast('Recuperação de Senha', "ambas as senhas devem ser iguais!", 'error');
+    }
+  }
+
+  async function sendRecoverEmail() {
+    try {
+
+      setLoading(true);
+
+      await apiClient('/api/auth/recover-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: regEmail }),
+      });
+
+      setRegEmail("");
+      setLoading(false);
+      showToast('Email enviado', `Email de recuperação de senha enviado com sucesso (Atenção na caixa de spam)!`, 'success');
+      isRecoverPassword(false);
+    } catch(err: any) {
+      setLoading(false);
+      isRecoverPassword(true);
+      showToast('Envio de códio', err.message, 'error');
     }
   }
 
@@ -81,10 +134,27 @@ export function AuthSection() {
   const inputCls = 'w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500';
   const inputNoPadCls = 'w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500';
 
+  const [recovery, recoveryPassword] = useState<boolean>(false);
+  const [hashCode, setHashCode] = useState<string | undefined>();
+  const [passwordRecovery, setPasswordRecovery] = useState<string | undefined>();
+  const [confirmPasswordRecovery, setConfirmPasswordRecovery] = useState<string | undefined>();
+
+  const formRef = useRef<any>(null);
+
+  const router = useRouter();
+
+  useEffect(function () {
+    var recoverHashcode = searchParams.get('recorver-hashcode');
+    if(recoverHashcode) {
+      recoveryPassword(true);
+      setHashCode(recoverHashcode);
+    }
+  }, [])
+
   return (
     <section className="max-w-md mx-auto my-12 bg-slate-800 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
-        <div className="flex border-b border-slate-700 mb-6">
+        <div className={cn("flex border-b border-slate-700 mb-6", recoverPassword || recovery ? "hidden" : "")}>
           <button onClick={() => setMode('login')} className={mode === 'login' ? activeBtnCls : inactiveBtnCls}>
             Entrar
           </button>
@@ -94,36 +164,104 @@ export function AuthSection() {
         </div>
 
         {mode === 'login' && (
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1">Usuário</label>
-              <div className="relative">
-                <i className="fa-solid fa-user absolute left-3 top-3.5 text-slate-500" />
-                <input type="text" required value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
-                  className={inputCls} placeholder="ex: jgomez" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1">Senha</label>
-              <div className="relative">
-                <i className="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500" />
-                <input type="password" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
-                  className={inputCls} placeholder="••••••••" />
-              </div>
-            </div>
-            <button type="submit" disabled={loading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20">
-              <i className="fa-solid fa-right-to-bracket mr-2" />Acessar Sistema
-            </button>
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-slate-700" />
-              <span className="flex-shrink mx-4 text-slate-500 text-xs">Ou teste rápido</span>
-              <div className="flex-grow border-t border-slate-700" />
-            </div>
-            {/* <button type="button" onClick={handleLoadDemo} disabled={loading}
-              className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-2 px-4 rounded-xl transition text-sm">
-              <i className="fa-solid fa-database mr-2" />Carregar 8 Jogadores Demo e Entrar
-            </button> */}
+          <form onSubmit={recovery ? handleRecoveryPassword :  handleLogin} ref={formRef} className="space-y-4">
+            {
+              recoverPassword && !recovery ?
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">E-mail</label>
+                    <input type="email" required defaultValue={regEmail} onChange={e => setRegEmail(e.target.value)}
+                      className={inputNoPadCls} placeholder="ex: example@gmail.com"
+                      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                      title="Please enter a valid email address (e.g., name@example.com)"
+                    />
+                  </div>
+                  <button type="button" disabled={loading}
+                    onClick={async () => {
+                      if (regEmail.length == 0) {
+                        showToast('Recuperação de Senha', "informe o email do usuário!", 'error');
+                        return;
+                      }
+
+                      await sendRecoverEmail();
+                    }}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 text-white">
+                    <i className="fa-solid fa-key mr-2" />Recuperar Senha
+                  </button>
+                  <button type="button" disabled={loading} onClick={() => {
+                    isRecoverPassword(false);
+                  }}
+                    className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-3 px-4 rounded-xl transition text-sm">
+                    <i className="fa-solid fa-user mr-2" />Login
+                  </button>
+                </> :
+              recovery ?
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">Senha</label>
+                    <input type="password" required defaultValue={passwordRecovery} onChange={e => setPasswordRecovery(e.target.value)}
+                      className={inputNoPadCls} placeholder="****"
+                      autoComplete="off"
+                      pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#$%^&+=]).{8,50}$" 
+                      title="A senha deve ter de 8 a 50 caracteres e incluir pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial." 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">confirmar Senha</label>
+                    <input type="password" required defaultValue={confirmPasswordRecovery} onChange={e => setConfirmPasswordRecovery(e.target.value)}
+                      className={inputNoPadCls} placeholder="****"
+                      pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#$%^&+=]).{8,50}$" 
+                      autoComplete="off"
+                      title="A senha deve ter de 8 a 50 caracteres e incluir pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial." 
+                    />
+                  </div>
+                   <button type="submit" disabled={loading}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 text-white">
+                    <i className="fa-solid fa-key mr-2" />Recuperar Senha
+                  </button>
+                  <button type="button" disabled={loading} onClick={() => {
+                    isRecoverPassword(false);
+                    recoveryPassword(false);
+                  }}
+                    className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-3 px-4 rounded-xl transition text-sm  text-white">
+                    <i className="fa-solid fa-user mr-2" />Login
+                  </button>
+                </>
+              :
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">Usuário</label>
+                    <div className="relative">
+                      <i className="fa-solid fa-user absolute left-3 top-3.5 text-slate-500" />
+                      <input type="text" required value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
+                        className={inputCls} placeholder="ex: jgomez" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">Senha</label>
+                    <div className="relative">
+                      <i className="fa-solid fa-lock absolute left-3 top-3.5 text-slate-500" />
+                      <input type="password" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
+                        className={inputCls} placeholder="••••••••" />
+                    </div>
+                  </div>
+                  <button type="submit" disabled={loading}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-slate-950 font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20  text-white">
+                    <i className="fa-solid fa-right-to-bracket mr-2" />Acessar Sistema
+                  </button>
+                  <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-slate-700" />
+                    <span className="flex-shrink mx-4 text-slate-500 text-xs">Ou recuperar a senha</span>
+                    <div className="flex-grow border-t border-slate-700" />
+                  </div>
+                  <button type="button" disabled={loading} onClick={() => {
+                    isRecoverPassword(true);
+                  }}
+                    className="w-full bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-200 font-semibold py-2 px-4 rounded-xl transition text-sm">
+                    <i className="fa-solid fa-user mr-2" />Recuperar Senha
+                  </button>
+                </>
+            }
           </form>
         )}
 

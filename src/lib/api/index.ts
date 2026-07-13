@@ -23,6 +23,10 @@ export async function apiClient<T>(url: string, options: RequestInit = {}): Prom
   const data = await response.json();
 
   if (!response.ok) {
+    if(data.message) {
+      throw new Error(data.message);
+    }
+
     throw new Error(data.error || 'Erro na requisição');
   }
 

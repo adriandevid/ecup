@@ -4,6 +4,7 @@ export interface User {
   name: string;
   photo_url: string;
   description: string;
+  email?: string | undefined;
 }
 
 export interface Championship {

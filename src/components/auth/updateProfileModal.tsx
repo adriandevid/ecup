@@ -14,6 +14,7 @@ export default function UpdateProfile() {
     const [regUsername, setRegUsername] = useState(currentUser?.username);
     const [regPhotoUrl, setRegPhotoUrl] = useState(currentUser?.photo_url);
     const [regDesc, setRegDesc] = useState(currentUser?.description);
+    const [regEmail, setRegEmail] = useState(currentUser?.email);
 
     useEffect(function () {
         if (currentUser) {
@@ -21,9 +22,10 @@ export default function UpdateProfile() {
             setRegUsername(currentUser.username);
             setRegPhotoUrl(currentUser.photo_url);
             setRegDesc(currentUser.description);
+            setRegEmail(currentUser.email);
         }
     }, [currentUser])
-    
+
     const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent) {
@@ -36,7 +38,8 @@ export default function UpdateProfile() {
                 body: JSON.stringify({
                     name: regName, username: regUsername,
                     photo_url: regPhotoUrl, description: regDesc,
-                    id: currentUser?.id
+                    id: currentUser?.id,
+                    email: regEmail
                 }),
             });
             addQueryLog('UPDATE USER', `
@@ -44,7 +47,8 @@ export default function UpdateProfile() {
                     SET username = ${regUsername},
                         name = ${regName},
                         photo_url = ${regPhotoUrl},
-                        description = ${regDesc}
+                        description = ${regDesc},
+                        email = '${regEmail}'
 
                 WHERE id = ${currentUser?.id} RETURNING *;
             `);
@@ -52,12 +56,13 @@ export default function UpdateProfile() {
             setCurrentUser({
                 name: `${regName}`, username: `${regUsername}`,
                 photo_url: `${regPhotoUrl}`, description: `${regDesc}`,
-                id: currentUser ? currentUser.id : 0
+                id: currentUser ? currentUser.id : 0,
+                email: regEmail
             });
 
             setUpdateProfileIsModalOpenState(false);
             showToast('Registro Atualizado', `Conta de ${data.user.name} atualizada!`, 'success');
-                
+
             router.refresh();
         } catch (err) {
             showToast('Erro de Registro', (err as Error).message, 'error');
@@ -72,7 +77,7 @@ export default function UpdateProfile() {
 
     return (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-up">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl max-w-[50rem] w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-up">
                 <div className="p-6 border-b border-slate-700 flex justify-between items-center">
                     <h3 className="text-lg font-bold text-white">
                         <i className="fa-solid fa-trophy text-emerald-400 mr-2" />Atualização de Perfil
@@ -82,22 +87,37 @@ export default function UpdateProfile() {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="py-10 px-10 flex flex-col gap-5">
-                    <img
-                        className="h-40 w-40 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/80 transition"
-                        src={regPhotoUrl}
-                        alt={regPhotoUrl}
-                        onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }}
-                    />
+                <form onSubmit={handleSubmit} className="py-10 px-10 flex flex-col gap-5 overflow overflow-x-hidden overflow-y-auto">
+                    <div className="flex flex-row gap-4">
+                        <div className="flex flex-col">
+                            <img
+                                className="h-40 w-40 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/80 transition"
+                                src={regPhotoUrl}
+                                alt={regPhotoUrl}
+                                onError={e => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/1e293b/a5b4fc?text=FC'; }}
+                            />
+                        </div>
+                    </div>
                     <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-1">Nome Completo</label>
                         <input type="text" required value={regName} onChange={e => setRegName(e.target.value)}
                             className={inputNoPadCls} placeholder="ex: João Gomez" />
                     </div>
                     <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-1">E-mail</label>
+                        <input type="email" required defaultValue={regEmail} onChange={e => setRegEmail(e.target.value)}
+                            className={inputNoPadCls} placeholder="ex: example@gmail.com"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                            title="Please enter a valid email address (e.g., name@example.com)"
+                        />
+                    </div>
+                    <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-1">Nome de Usuário (Login)</label>
-                        <input type="text" required value={regUsername} onChange={e => setRegUsername(e.target.value)}
-                            className={inputNoPadCls} placeholder="ex: jgomez" />
+                        <input type="text" value={regUsername} onChange={e => setRegUsername(e.target.value)}
+                            className={inputNoPadCls} placeholder="ex: jgomez"
+                            pattern="[^\s]+"
+                            title="Espaços não são permitidos."
+                            required />
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-1">Link da Foto de Perfil (URL)</label>
