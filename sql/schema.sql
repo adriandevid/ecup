@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS "permissions" (
 CREATE TABLE IF NOT EXISTS "reset_tokens" (
 	id serial not null primary key,
 	hash_code text not null,
-	expiration_date timestamp not null,
+	expiration_date timestamp with time zone not null,
 	email text not null
 );
 
