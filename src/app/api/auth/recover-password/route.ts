@@ -25,6 +25,8 @@ export async function POST(req: NextRequest) {
 
     date.setMinutes(date.getMinutes() + 5);
 
+    console.log(date.toUTCString());
+    
     await query<{ id: number, expiration_date: string, hash_code: string, email: string } | undefined | null>(
         'INSERT INTO public.reset_tokens(hash_code, expiration_date, email) VALUES($1, $2, $3)  RETURNING id, hash_code, expiration_date, email;',
         [aleatoryHash, date.toUTCString(), email]
