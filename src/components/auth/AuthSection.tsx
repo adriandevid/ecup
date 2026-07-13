@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { User } from '@/types';
 import { cn } from '@/lib/tailwindcss';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {  useRouter } from 'next/navigation';
 
 type AuthMode = 'login' | 'register';
 
@@ -26,8 +26,6 @@ export function AuthSection() {
 
   const [recoverPassword, isRecoverPassword] = useState<boolean>(false);
 
-  const searchParams = useSearchParams();
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -46,6 +44,11 @@ export function AuthSection() {
     }
   }
 
+  function getParams(param: string) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
   async function handleRecoveryPassword(e: React.FormEvent) {
     e.preventDefault();
     if(passwordRecovery == confirmPasswordRecovery) {
@@ -55,15 +58,15 @@ export function AuthSection() {
           method: 'POST',
           body: JSON.stringify({ password: passwordRecovery, confirmPassword: confirmPasswordRecovery, recover_hashcode: hashCode }),
         });
-        
+
         router.push(`/`, { scroll: false });
         
         setLoading(false);
         showToast('Alteração de senha', "Senha alterada com sucesso!", "success");
         recoveryPassword(false);
-      } catch(err: any) {
+      } catch(err) {
         setLoading(false);
-        showToast('Alteração de senha', err.message, 'error');
+        showToast('Alteração de senha', (err as Error).message, 'error');
       }
 
     } else {
@@ -85,10 +88,10 @@ export function AuthSection() {
       setLoading(false);
       showToast('Email enviado', `Email de recuperação de senha enviado com sucesso (Atenção na caixa de spam)!`, 'success');
       isRecoverPassword(false);
-    } catch(err: any) {
+    } catch(err) {
       setLoading(false);
       isRecoverPassword(true);
-      showToast('Envio de códio', err.message, 'error');
+      showToast('Envio de códio', (err as Error).message, 'error');
     }
   }
 
@@ -139,15 +142,15 @@ export function AuthSection() {
   const [passwordRecovery, setPasswordRecovery] = useState<string | undefined>();
   const [confirmPasswordRecovery, setConfirmPasswordRecovery] = useState<string | undefined>();
 
-  const formRef = useRef<any>(null);
-
   const router = useRouter();
-
+  
   useEffect(function () {
-    var recoverHashcode = searchParams.get('recorver-hashcode');
-    if(recoverHashcode) {
-      recoveryPassword(true);
-      setHashCode(recoverHashcode);
+    if(window !== undefined) {
+      const recoverHashcode = getParams('recorver-hashcode');
+      if(recoverHashcode != null) {
+        recoveryPassword(true);
+        setHashCode(recoverHashcode);
+      }
     }
   }, [])
 
@@ -164,7 +167,7 @@ export function AuthSection() {
         </div>
 
         {mode === 'login' && (
-          <form onSubmit={recovery ? handleRecoveryPassword :  handleLogin} ref={formRef} className="space-y-4">
+          <form onSubmit={recovery ? handleRecoveryPassword :  handleLogin} className="space-y-4">
             {
               recoverPassword && !recovery ?
                 <>

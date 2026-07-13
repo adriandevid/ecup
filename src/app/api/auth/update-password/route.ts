@@ -1,13 +1,12 @@
 import { query, queryOne } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import bcrypt from 'bcryptjs';
 import { User } from '@/types';
 
 export async function POST(req: NextRequest) {
-    const { password, confirmPassword, recover_hashcode } = await req.json();
+    const { password, recover_hashcode } : { password: string, recover_hashcode: string } = await req.json();
 
-    const reset_token = await queryOne<{ id: number, expiration_date: any, email: string }>('SELECT id, expiration_date, email FROM reset_tokens WHERE hash_code = $1  order by id desc;', [recover_hashcode]);
+    const reset_token = await queryOne<{ id: number, expiration_date: string, email: string }>('SELECT id, expiration_date, email FROM reset_tokens WHERE hash_code = $1  order by id desc;', [recover_hashcode]);
 
     if(reset_token == null) {
         return NextResponse.json({ message: "O código de solicitação de troca de senha não existe ou não é válido!"}, { status: 400 });

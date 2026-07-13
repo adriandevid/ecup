@@ -5,15 +5,15 @@ import { Resend } from 'resend';
 export async function POST(req: NextRequest) {
     const { email } = await req.json();
 
-    var url = "http://localhost:3000";
+    const url = process.env.RECOVER_PASSWORD_URL;
 
-    const existingUserWithEmail = await queryOne<any>('SELECT id FROM users WHERE email = $1;', [email]);
+    const existingUserWithEmail = await queryOne<{ id: number } | undefined | null>('SELECT id FROM users WHERE email = $1;', [email]);
 
     if(existingUserWithEmail == undefined || existingUserWithEmail == null) {
         return NextResponse.json({ message: "Usuário referente ao email não encontrado!" }, { status: 400 });
     }
 
-    const existing = await queryOne<any>('SELECT id, expiration_date FROM reset_tokens WHERE email = $1  order by id desc;', [email]);
+    const existing = await queryOne<{ id: number, expiration_date: string }| undefined | null>('SELECT id, expiration_date FROM reset_tokens WHERE email = $1  order by id desc;', [email]);
 
     if(existing != null && new Date() > new Date(existing.expiration_date)) {
         return NextResponse.json({ message: "Existe um token válido que já foi enviado ao seu email!" }, { status: 400 });
@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
 
     const aleatoryHash = Math.random().toString(36).substring(2, 12);
 
-    var date = new Date();
+    const date = new Date();
     date.setMinutes(date.getMinutes() + 5);
 
-    const rows = await query<any>(
+    await query<{ id: number, expiration_date: string, hash_code: string, email: string } | undefined | null>(
         'INSERT INTO public.reset_tokens(hash_code, expiration_date, email) VALUES($1, $2, $3)  RETURNING id, hash_code, expiration_date, email;',
         [aleatoryHash, date, email]
     );
