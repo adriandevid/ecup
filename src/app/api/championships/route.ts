@@ -50,38 +50,55 @@ export async function POST(req: NextRequest) {
 
     if (type === 'pontos_corridos') {
       await generateRoundRobin(champId, playerIds);
+      await generateRoundRobin(champId, playerIds, true);
     } else {
       await generateKnockout(champId, playerIds);
     }
 
     return NextResponse.json({ id: champId }, { status: 201 });
   } catch (err) {
-    console.error(err);
     return NextResponse.json({ error: 'Erro ao criar campeonato' }, { status: 500 });
   }
 }
 
-async function generateRoundRobin(champId: number, players: number[]) {
-  const list = [...players];
+async function generateRoundRobin(champId: number, players: number[], return_rounds?: boolean | undefined) {
+  var list = [...players];
   if (list.length % 2 !== 0) list.push(0);
 
   const totalTeams = list.length;
   const totalRounds = totalTeams - 1;
   const halfSize = totalTeams / 2;
 
-  for (let round = 1; round <= totalRounds; round++) {
-    for (let i = 0; i < halfSize; i++) {
-      const home = list[i];
-      const away = list[totalTeams - 1 - i];
-      if (home !== 0 && away !== 0) {
-        const [h, a] = round % 2 === 0 ? [away, home] : [home, away];
-        await query(
-          'INSERT INTO matches (championship_id, round, home_user_id, away_user_id, home_score, away_score, played) VALUES ($1,$2,$3,$4,0,0,false)',
-          [champId, round, h, a]
-        );
+  if (return_rounds) {
+    for (let round = totalRounds + 1; round <= totalRounds * 2; round++) {
+      for (let i = 0; i < halfSize; i++) {
+        const home = list[i];
+        const away = list[totalTeams - 1 - i];
+        if (home !== 0 && away !== 0) {
+          //const [h, a] = round % 2 === 0 ? [away, home] : [home, away];
+          await query(
+            'INSERT INTO matches (championship_id, round, home_user_id, away_user_id, home_score, away_score, played) VALUES ($1,$2,$3,$4,0,0,false)',
+            [champId, round, away, home]
+          );
+        }
       }
+      list.splice(1, 0, list.pop()!);
     }
-    list.splice(1, 0, list.pop()!);
+  } else {
+    for (let round = 1; round <= totalRounds; round++) {
+      for (let i = 0; i < halfSize; i++) {
+        const home = list[i];
+        const away = list[totalTeams - 1 - i];
+        if (home !== 0 && away !== 0) {
+          //const [h, a] = round % 2 === 0 ? [away, home] : [home, away];
+          await query(
+            'INSERT INTO matches (championship_id, round, home_user_id, away_user_id, home_score, away_score, played) VALUES ($1,$2,$3,$4,0,0,false)',
+            [champId, round, home, away]
+          );
+        }
+      }
+      list.splice(1, 0, list.pop()!);
+    }
   }
 }
 
