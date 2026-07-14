@@ -252,8 +252,8 @@ export function PlayersTab() {
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                     </div>
                                 </div>
-                                <p className="text-3xl font-extrabold text-white" id="stat-gols-sofridos">0</p>
-                                <p className="text-[10px] text-slate-500 mt-1" id="stat-saldo-gols">Saldo de golos: 0</p>
+                                <p className="text-3xl font-extrabold text-white" id="stat-gols-sofridos">{playerSelected.goals_conceded}</p>
+                                <p className="text-[10px] text-slate-500 mt-1" id="stat-saldo-gols">Saldo de golos: {playerSelected.goals - playerSelected.goals_conceded}</p>
                             </div>
 
                             <div className="bg-[#0b111e] rounded-2xl border border-borderBlue p-5 relative overflow-hidden group hover:border-amber-500/50 transition-all duration-300 shadow-lg">
@@ -265,7 +265,7 @@ export function PlayersTab() {
                                     </div>
                                 </div>
                                 <p className="text-3xl font-extrabold text-white" id="stat-campeonatos">{playerSelected.champs_count}</p>
-                                <p className="text-[10px] text-slate-500 mt-1" id="stat-torneios-participados">0 Participação ativa</p>
+                                {/* <p className="text-[10px] text-slate-500 mt-1" id="stat-torneios-participados">0Participação ativa</p> */}
                             </div>
                             <div className="bg-[#0b111e] rounded-2xl border border-borderBlue p-5 relative overflow-hidden group hover:border-slate-500/50 transition-all duration-300 shadow-lg">
                                 <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-slate-500/5 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
@@ -350,46 +350,28 @@ export function PlayersTab() {
                                 <div className="text-center md:text-left flex-grow">
                                     <h4 className="text-lg font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
                                         Sala dos Troféus Virtuais
-                                        <span className="text-xs bg-[#1e2d4a] text-slate-300 font-semibold px-2 py-0.5 rounded-full" id="trophy-count-badge">3 Conquistas</span>
+                                        <span className="text-xs bg-[#1e2d4a] text-slate-300 font-semibold px-2 py-0.5 rounded-full" id="trophy-count-badge">{playerSelected.championships_win != undefined && playerSelected.championships_win != null ? playerSelected.championships_win.split(',').length : 0} Conquistas</span>
                                     </h4>
                                     <p className="text-xs text-slate-400 mt-1">Galeria histórica contendo todas as taças e campeonatos vencidos por este pro-player ao longo das épocas.</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full" id="trophy-shelf">
-                                <div className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Champions Cup T1">
-                                    <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
-                                        <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
-                                    </div>
-                                    <div className="leading-none mt-1 w-full">
-                                        <span className="text-[9px] uppercase font-black tracking-widest block opacity-90">Ouro</span>
-                                        <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Champions Cup T1">Champions Cup T1</span>
-                                        <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 1</span>
-                                    </div>
-                                </div>
-
-                                <div className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Liga de Elite T2">
-                                    <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
-                                        <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
-                                    </div>
-
-                                    <div className="leading-none mt-1 w-full">
-                                        <span className="text-[9px] uppercase font-black tracking-widest block opacity-90">Ouro</span>
-                                        <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Liga de Elite T2">Liga de Elite T2</span>
-                                        <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 2</span>
-                                    </div>
-                                </div>
-
-                                <div className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Copa dos Campeões T3">
-                                    <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
-                                        <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
-                                    </div>
-                                    <div className="leading-none mt-1 w-full">
-                                        <span className="text-[9px] uppercase font-black tracking-widest block opacity-90">Ouro</span>
-                                        <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Copa dos Campeões T3">Copa dos Campeões T3</span>
-                                        <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 3</span>
-                                    </div>
-                                </div>
+                                {
+                                    playerSelected.championships_win != undefined ?
+                                        playerSelected.championships_win.split(',').map((x, index) => (
+                                            <div key={index} className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Champions Cup T1">
+                                                <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                    <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
+                                                </div>
+                                                <div className="leading-none mt-1 w-full">
+                                                    <span className="text-[9px] uppercase font-black tracking-widest block opacity-90">Ouro</span>
+                                                    <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Champions Cup T1">{x}</span>
+                                                    <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 1</span>
+                                                </div>
+                                            </div>
+                                        )) : <></>
+                                }
                             </div>
                         </div>
                     </section>

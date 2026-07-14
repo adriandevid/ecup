@@ -43,6 +43,9 @@ export interface PlayerStats {
   champs_count: number;
   matches_played: number;
   goals: number;
+  championships: string;
+  championships_win: string;
+  goals_conceded: number;
 }
 
 export interface Standings {
