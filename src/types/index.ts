@@ -44,7 +44,6 @@ export interface PlayerStats {
   matches_played: number;
   goals: number;
   championships: string;
-  championships_win: string;
   goals_conceded: number;
 }
 

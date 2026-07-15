@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
-import { Match } from '@/types';
+import { Match, Standings } from '@/types';
 
 export async function PUT(
   req: NextRequest,
@@ -65,26 +65,22 @@ export async function PUT(
       const championshipState = await queryOne<{ players: number, matchers: number, championship_concluded: boolean }>(`
         select 
           (select count(1) from championship_players a where a.championship_id = c.id) as players, 
-          (select count(1) from matches p where p.championship_id = c.id) as partidas,
-          (select count(1) from matches p where p.championship_id = c.id) = (select count(1) from matches p where p.championship_id = c.id and p.played = true) as finalizada
+          (select count(1) from matches p where p.championship_id = c.id) as matchers,
+          (select count(1) from matches p where p.championship_id = c.id) = (select count(1) from matches p where p.championship_id = c.id and p.played = true) as championship_concluded
         from championships c 
         where c.id = $1
       `, [match.championship_id])
 
-      if(championshipState != null && championshipState.championship_concluded) {
-        await query(`
-          update championships as cs
-            set winner_id = a.id
-            from (
+      if (championshipState != null && championshipState.championship_concluded) {
+        const standings = await query<Standings>(`
               WITH player_stats AS (
                 SELECT
                   cp.user_id AS pid,
-                  cp.championship_id,
                   COALESCE(SUM(CASE
                     WHEN m.played = true AND m.home_user_id = cp.user_id AND m.home_score > m.away_score  THEN 3
                     WHEN m.played = true AND m.away_user_id = cp.user_id AND m.away_score > m.home_score  THEN 3
                     WHEN m.played = true AND (m.home_user_id = cp.user_id OR m.away_user_id = cp.user_id)
-                        AND m.home_score = m.away_score THEN 1
+                         AND m.home_score = m.away_score THEN 1
                     ELSE 0
                   END), 0)::int AS points,
                   COUNT(CASE WHEN m.played = true AND (m.home_user_id = cp.user_id OR m.away_user_id = cp.user_id) THEN 1 END)::int AS matches_played,
@@ -108,27 +104,31 @@ export async function PUT(
                     WHEN m.played = true AND m.home_user_id = cp.user_id THEN m.away_score
                     WHEN m.played = true AND m.away_user_id = cp.user_id THEN m.home_score
                     ELSE 0
-                  END), 0)::int AS goals_against 
+                  END), 0)::int AS goals_against
                 FROM championship_players cp
                 LEFT JOIN matches m
                   ON (m.home_user_id = cp.user_id OR m.away_user_id = cp.user_id)
                   AND m.championship_id = cp.championship_id
                 WHERE cp.championship_id = $1
-                GROUP BY cp.user_id, cp.championship_id
+                GROUP BY cp.user_id
               )
-              select  u.id, u.name
+              SELECT ps.*, u.name, u.photo_url
               FROM player_stats ps
               JOIN users u ON u.id = ps.pid
-              ORDER BY ps.points DESC, (ps.goals_for - ps.goals_against) DESC, ps.goals_for DESC, u.name asc limit 1
-            ) as a
-            where cs.id = $1
-        `, [match.championship_id])
+              ORDER BY ps.points DESC, (ps.goals_for - ps.goals_against) DESC, ps.goals_for DESC, u.name ASC
+        `, [match.championship_id]);
+
+        await query(`
+          UPDATE public.championships
+          SET winner_id=$2, runner_up_id=$3, third_place_id=$4, first_relegated_id=$5, second_relegated_id=$6
+          WHERE id = $1;
+        `, [match.championship_id, standings[0].pid, standings[1].pid, standings[2].pid, standings[standings.length - 2].pid, standings[standings.length - 1].pid])
       }
     }
 
     return NextResponse.json({ success: true, champion });
   } catch (err) {
-    console.error(err);
+    console.log(err)
     return NextResponse.json({ error: 'Erro ao salvar placar' }, { status: 500 });
   }
 }
