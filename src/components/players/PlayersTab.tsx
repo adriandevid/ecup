@@ -124,13 +124,15 @@ export function PlayersTab() {
 
     useEffect(() => { loadPlayers(); }, [loadPlayers]);
 
-    const [playerSelected, selectPlayer] = useState<PlayerStats | undefined>(players[0]);
+    const [playerSelected, selectPlayer] = useState<PlayerStats | undefined>();
 
     useEffect(function () {
         if (players.length > 0) {
             selectPlayer(players[0])
         }
     }, [players])
+
+    console.log(playerSelected);
 
     return (
         <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6">
@@ -145,7 +147,7 @@ export function PlayersTab() {
                     <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1" id="players-list">
                         {
                             players.map(x => (
-                                <button key={x.id} onClick={() => selectPlayer(x)} className={cn("w-full text-left p-3.5 rounded-xl border bg-cardHover shadow-md shadow-emerald-500/5 transition-all flex items-center justify-between gap-3 group", playerSelected != undefined && x.id == playerSelected!.id ? 'border-accentGreen' : 'border-borderBlue')}>
+                                <button key={x.id} onClick={() => selectPlayer({ ...x })} className={cn("w-full text-left p-3.5 rounded-xl border bg-cardHover shadow-md shadow-emerald-500/5 transition-all flex items-center justify-between gap-3 group", playerSelected != undefined && x.id == playerSelected!.id ? 'border-accentGreen' : 'border-borderBlue')}>
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-[#18243c] flex items-center justify-center text-lg shrink-0 border border-borderBlue group-hover:scale-105 transition-transform">
                                             ⚽
@@ -350,27 +352,109 @@ export function PlayersTab() {
                                 <div className="text-center md:text-left flex-grow">
                                     <h4 className="text-lg font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
                                         Sala dos Troféus Virtuais
-                                        <span className="text-xs bg-[#1e2d4a] text-slate-300 font-semibold px-2 py-0.5 rounded-full" id="trophy-count-badge">{playerSelected.championships_win != undefined && playerSelected.championships_win != null ? playerSelected.championships_win.split(',').length : 0} Conquistas</span>
+                                        <span className="text-xs bg-[#1e2d4a] text-slate-300 font-semibold px-2 py-0.5 rounded-full" id="trophy-count-badge">{playerSelected.championships != undefined && playerSelected.championships != null ? playerSelected.championships.split(',').length : 0} Conquistas</span>
                                     </h4>
                                     <p className="text-xs text-slate-400 mt-1">Galeria histórica contendo todas as taças e campeonatos vencidos por este pro-player ao longo das épocas.</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full" id="trophy-shelf">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 w-full" id="trophy-shelf">
                                 {
-                                    playerSelected.championships_win != undefined ?
-                                        playerSelected.championships_win.split(',').map((x, index) => (
-                                            <div key={index} className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Champions Cup T1">
-                                                <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
-                                                    <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
+                                    playerSelected.championships != undefined ?
+                                        playerSelected.championships.split(',').map((x, index) => {
+                                            console.log(x.toLowerCase().includes('inviolável'));
+
+                                            if (x.toLowerCase().includes('vencedor')) {
+                                                return (
+                                                    <div key={index} className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Champions Cup T1">
+                                                        <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                            <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
+                                                        </div>
+                                                        <div className="leading-none mt-1 w-full">
+                                                            <span className="text-[9px] uppercase font-black tracking-widest block opacity-90">Ouro</span>
+                                                            <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Champions Cup T1">{x}</span>
+                                                            <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 1</span>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            } else if (x.toLowerCase().includes('segundo')) {
+                                                return (
+                                                    <div key={index} className="trophy-card bg-gradient-to-b from-slate-400/20 via-slate-700/20 to-slate-500/10 border-slate-400/35 text-slate-300 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Supercopa Ecup T4">
+                                                        <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                            <span className="text-2xl filter drop-shadow">🥈</span>
+                                                        </div>
+                                                        <div className="leading-none mt-1 w-full flex flex-col items-center">
+                                                            <span className="text-[9px] uppercase font-black tracking-widest block opacity-95">Vice (2º)</span>
+                                                            <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Supercopa Ecup T4">{x}</span>
+                                                            <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 4</span>
+
+                                                        </div>
+                                                    </div>
+                                                )
+                                            } else if (x.toLowerCase().includes('terceiro')) {
+                                                return (
+                                                    <div key={index} className="trophy-card bg-gradient-to-b from-orange-800/10 via-orange-950/20 to-orange-900/5 border-orange-700/30 text-orange-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Copa Regional T3">
+                                                        <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                            <span className="text-2xl filter drop-shadow">🥉</span>
+                                                        </div>
+
+                                                        <div className="leading-none mt-1 w-full flex flex-col items-center">
+                                                            <span className="text-[9px] uppercase font-black tracking-widest block opacity-95">3º Lugar</span>
+                                                            <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Copa Regional T3">{x}</span>
+                                                            <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 3</span>
+
+                                                        </div>
+                                                    </div>
+                                                )
+                                            } else if (x.toLowerCase().includes('rebaixado')) {
+                                                return (
+                                                    <div key={index}  className="relegation-card bg-gradient-to-b from-red-950 via-red-900 to-black border-red-500 text-red-200 border-2 p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-2xl hover:scale-105 transition-all duration-300">
+                                                        <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#1b080b] border-2 border-red-500 shadow-inner mb-2">
+                                                            <span className="text-3xl filter drop-shadow">💀</span>
+                                                        </div>
+                                                        <div className="leading-none mt-2 w-full">
+                                                            <span className="text-[10px] uppercase font-black tracking-widest block text-red-400">Troféu Lanterna</span>
+                                                            <span className="text-[12px] text-white font-extrabold block mt-1">{x}</span>
+                                                            <div className="bg-red-600 text-white font-extrabold text-[10px] tracking-wider px-3 py-1 rounded-full mt-3 inline-block shadow-lg shadow-red-900/50">
+                                                                Nível: 1
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            } else if(x.toLowerCase().includes('inviolável')) {
+                                               return (
+                                                 <div key={index} className="trophy-card bg-gradient-to-b from-slate-800/10 via-slate-900/10 to-slate-950/10 border-slate-700/20 text-slate-500 opacity-40 filter grayscale border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Medalha de Consistência">
+                                                    <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                        <span className="text-2xl filter drop-shadow">⚪</span>
+                                                    </div>
+                                                    <div className="leading-none mt-1 w-full flex flex-col items-center">
+                                                        <span className="text-[9px] uppercase font-black tracking-widest block opacity-95">Meio Tabela</span>
+                                                        <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Medalha de Consistência">{x}</span>
+                                                        <span className="text-[9px] text-slate-400 block mt-1 font-medium">Sem registos</span>
+                                                        
+                                                        <div className="bg-slate-800/30 text-slate-400 border border-slate-700/20 text-[9px] font-black tracking-wider px-2 py-0.5 rounded-full mt-2 inline-block">
+                                                            Sem registos
+                                                        </div>
+                                                    
+                                                    </div>
                                                 </div>
-                                                <div className="leading-none mt-1 w-full">
-                                                    <span className="text-[9px] uppercase font-black tracking-widest block opacity-90">Ouro</span>
-                                                    <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Champions Cup T1">{x}</span>
-                                                    <span className="text-[9px] text-slate-400 block mt-1 font-medium">Temporada 1</span>
+                                               )
+                                            }
+                                            return (
+                                                <div key={index} className="trophy-card dispute-card bg-gradient-to-b from-blue-600/15 via-blue-900/25 to-blue-950/5 border-dashed border-blue-500/30 text-blue-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Ecup Masters T5">
+                                                    <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                        <span className="text-2xl filter drop-shadow">⚔️</span>
+                                                        <span className="absolute -top-1 -right-1 flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span>
+                                                    </div>
+
+                                                    <div className="leading-none mt-1 w-full flex flex-col items-center">
+                                                        <span className="text-[9px] uppercase font-black tracking-widest block opacity-95">Em Disputa</span>
+                                                        <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Ecup Masters T5">{x}</span>
+                                                        <span className="text-[9px] text-slate-400 block mt-1 font-medium">Em Disputa</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )) : <></>
+                                            )
+                                        }) : <></>
                                 }
                             </div>
                         </div>

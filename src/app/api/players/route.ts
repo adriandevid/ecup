@@ -17,12 +17,13 @@ export async function GET() {
 		          	cc.winner_id, cc.runner_up_id, cc.third_place_id, cc.first_relegated_id, 
 		          	cc.second_relegated_id,
 		          	(case 
-		          		when cc.winner_id = ul.id then 'Vencedor'
-		          		when cc.runner_up_id = ul.id then 'Segundo Colocado'
-		          		when cc.third_place_id = ul.id then 'Terceiro Colocado'
-		          		when cc.first_relegated_id = ul.id then 'Rabaixado'
-		          		when cc.second_relegated_id = ul.id then 'Rabaixado'
+		          		when cc.winner_id = ul.id and cc.status = 'finalizado' then 'Vencedor'
+		          		when cc.runner_up_id = ul.id and cc.status = 'finalizado' then 'Segundo Colocado'
+		          		when cc.third_place_id = ul.id and cc.status = 'finalizado' then 'Terceiro Colocado'
+		          		when cc.first_relegated_id = ul.id and cc.status = 'finalizado' then 'Rebaixado'
+		          		when cc.second_relegated_id = ul.id and cc.status = 'finalizado' then 'Rebaixado'
 		          		when cc.status = 'ativo' then 'Disputando'
+		          		when cc.status = 'finalizado' then 'Inviolável'
 		          	else
 		          		'Disputando'
 		            end)  as status
