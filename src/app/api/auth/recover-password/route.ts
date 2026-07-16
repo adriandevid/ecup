@@ -3,7 +3,8 @@ import { sendEmail } from '@/lib/email';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-    const { email } = await req.json();
+   try {
+     const { email } = await req.json();
 
     const url = process.env.RECOVER_PASSWORD_URL;
 
@@ -294,7 +295,8 @@ export async function POST(req: NextRequest) {
 </html>
         `
     });
-
-    
-    return NextResponse.json({}, { status: 200 });
+     return NextResponse.json({}, { status: 200 });
+   } catch(ex) {
+        return NextResponse.json({ error: (ex as Error).message }, { status: 400 });
+   }
 }
