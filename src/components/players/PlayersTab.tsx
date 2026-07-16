@@ -148,25 +148,25 @@ export function PlayersTab() {
                             <div className="bg-[#0b111e] rounded-2xl border border-borderBlue p-5 relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-300 shadow-lg">
                                 <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Golos Marcados</span>
+                                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gols Marcados</span>
                                     <div className="bg-emerald-500/10 p-2 rounded-lg text-accentGreen">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 4a2 2 0 114 0v1a2 2 0 002 2h3a1 1 0 011 1v3a2 2 0 01-2 2h-1a2 2 0 100 4h1a2 2 0 012 2v3a1 1 0 01-1 1h-3a2 2 0 00-2 2v1a2 2 0 11-4 0v-1a2 2 0 00-2-2H5a1 1 0 01-1-1v-3a2 2 0 00-2-2V9a2 2 0 002-2h3a2 2 0 002-2V4z" /></svg>
                                     </div>
                                 </div>
                                 <p className="text-3xl font-extrabold text-white" id="stat-gols-marcados">{playerSelected.goals}</p>
-                                <p className="text-[10px] text-slate-500 mt-1" id="stat-media-gols">Média: {Math.round(playerSelected.goals / playerSelected.matches_played)} golos / jogo</p>
+                                <p className="text-[10px] text-slate-500 mt-1" id="stat-media-gols">Média: {Math.round(playerSelected.goals / playerSelected.matches_played)} Gols / jogo</p>
                             </div>
 
                             <div className="bg-[#0b111e] rounded-2xl border border-borderBlue p-5 relative overflow-hidden group hover:border-red-500/50 transition-all duration-300 shadow-lg">
                                 <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-red-500/5 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Golos Sofridos</span>
+                                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gols Sofridos</span>
                                     <div className="bg-red-500/10 p-2 rounded-lg text-accentRed">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                     </div>
                                 </div>
                                 <p className="text-3xl font-extrabold text-white" id="stat-gols-sofridos">{playerSelected.goals_conceded}</p>
-                                <p className="text-[10px] text-slate-500 mt-1" id="stat-saldo-gols">Saldo de golos: {playerSelected.goals - playerSelected.goals_conceded}</p>
+                                <p className="text-[10px] text-slate-500 mt-1" id="stat-saldo-gols">Saldo de Gols: {playerSelected.goals - playerSelected.goals_conceded}</p>
                             </div>
 
                             <div className="bg-[#0b111e] rounded-2xl border border-borderBlue p-5 relative overflow-hidden group hover:border-amber-500/50 transition-all duration-300 shadow-lg">
@@ -213,7 +213,7 @@ export function PlayersTab() {
                                         </div>
                                         <div className="leading-tight">
                                             <h4 className="font-extrabold text-sm text-white">Bota de Ouro</h4>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">Mais de 30 golos marcados na liga.</p>
+                                            <p className="text-[10px] text-slate-400 mt-0.5">Mais de 30 Gols marcados na liga.</p>
                                         </div>
                                     </div>
 
@@ -235,7 +235,7 @@ export function PlayersTab() {
                                         </div>
                                         <div className="leading-tight">
                                             <h4 className="font-extrabold text-sm text-white">Senhor Hat-Trick</h4>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">Marcar 3 ou mais golos no mesmo jogo.</p>
+                                            <p className="text-[10px] text-slate-400 mt-0.5">Marcar 3 ou mais Gols no mesmo jogo.</p>
                                         </div>
                                     </div>
 
