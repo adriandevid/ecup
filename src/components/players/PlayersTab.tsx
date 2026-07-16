@@ -275,7 +275,7 @@ export function PlayersTab() {
                                         playerSelected.championships.split(',').map((x, index) => {
                                             if (x.toLowerCase().includes('vencedor')) {
                                                 return (
-                                                    <div key={index} className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Champions Cup T1">
+                                                    <div key={index} className="trophy-card championwinner-card bg-gradient-to-b from-yellow-950 via-yellow-900 to-black border-yellow-500 text-yellow-200 border-2 p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-2xl hover:scale-105 transition-all duration-300" title="Champions Cup T1">
                                                         <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
                                                             <span className="text-2xl filter drop-shadow animate-pulse">🏆</span>
                                                         </div>
