@@ -85,7 +85,7 @@ export function PlayersTab() {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-cardBg to-[#112440] rounded-2xl border border-borderBlue p-4 relative overflow-hidden">
+                {/* <div className="bg-gradient-to-br from-cardBg to-[#112440] rounded-2xl border border-borderBlue p-4 relative overflow-hidden">
                     <div className="absolute -right-8 -bottom-8 opacity-10 text-white font-black text-8xl">🏆</div>
                     <h3 className="text-xs font-semibold uppercase tracking-wider text-accentGreen mb-1">Ecup Pro League</h3>
                     <p className="text-lg font-bold text-white">Temporada Ativa 4</p>
@@ -98,7 +98,7 @@ export function PlayersTab() {
                     <div className="w-full bg-[#090d16] h-1.5 rounded-full mt-2 overflow-hidden">
                         <div className="bg-accentGreen h-full rounded-full" style={{ width: '78%' }}></div>
                     </div>
-                </div>
+                </div> */}
             </aside>
 
             {
