@@ -7,7 +7,7 @@ export async function sendEmail(form: {
         html: string
     }) {
     const transporter = createTransport({
-        host: process.env.SMTP_PROVIDER!, // Replace with your SMTP server host
+        host: process.env.SMTP_PROVIDER, // Replace with your SMTP server host
         port: 587,                // 587 (TLS) or 465 (SSL)
         secure: false,            // true for 465, false for other ports
         auth: {
