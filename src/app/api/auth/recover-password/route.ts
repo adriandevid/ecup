@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         [aleatoryHash, expirationDate, email]
     );
 
-    const messageResult = await sendEmail({
+    await sendEmail({
         from: 'adriandevid36@gmail.com',
         to: email,
         subject: 'Recuperação de Senha do sistema Ecup',
@@ -295,7 +295,7 @@ export async function POST(req: NextRequest) {
 </html>
         `
     });
-     return NextResponse.json(messageResult, { status: 200 });
+     return NextResponse.json({}, { status: 200 });
    } catch(ex) {
         return NextResponse.json({ error: (ex as Error).message }, { status: 400 });
    }

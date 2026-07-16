@@ -16,6 +16,5 @@ export async function sendEmail(form: {
         },
     });
 
-   const senderEmail = await transporter.sendMail(form);
-   return senderEmail;
+   return await transporter.sendMail(form);
 }
