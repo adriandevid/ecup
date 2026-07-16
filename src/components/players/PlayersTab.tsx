@@ -66,11 +66,11 @@ export function PlayersTab() {
                                         <div className="leading-none">
                                             <div className="flex items-center gap-1.5">
                                                 <h4 className="font-bold text-sm text-white group-hover:text-accentGreen transition-colors">{x.name}</h4>
-                                                <div className="w-6 h-4 inline-flex rounded overflow-hidden border border-white/20">
+                                                {/* <div className="w-6 h-4 inline-flex rounded overflow-hidden border border-white/20">
                                                     <div className="w-1/3 bg-blue-600 h-full"></div>
                                                     <div className="w-1/3 bg-white h-full"></div>
                                                     <div className="w-1/3 bg-red-600 h-full"></div>
-                                                </div>
+                                                </div> */}
                                             </div>
                                             <span className="text-[10px] text-slate-400">@{x.username}</span>
                                         </div>
