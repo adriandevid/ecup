@@ -61,7 +61,7 @@ export function PlayersTab() {
                                 <button key={x.id} onClick={() => selectPlayer({ ...x })} className={cn("w-full text-left p-3.5 rounded-xl border bg-cardHover shadow-md shadow-emerald-500/5 transition-all flex items-center justify-between gap-3 group", playerSelected != undefined && x.id == playerSelected!.id ? 'border-accentGreen' : 'border-borderBlue')}>
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-[#18243c] flex items-center justify-center text-lg shrink-0 border border-borderBlue group-hover:scale-105 transition-transform">
-                                            ⚽
+                                            <img src={x.photo_url} alt="foto do perfil" className='rounded-full h-10' />
                                         </div>
                                         <div className="leading-none">
                                             <div className="flex items-center gap-1.5">
