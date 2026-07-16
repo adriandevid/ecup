@@ -4,103 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
 import { PlayerStats } from '@/types';
-import Image from 'next/image';
 import { cn } from '@/lib/tailwindcss';
-
-function IconPlayer({ u }: { u: PlayerStats }) {
-    const [noLoadImage, setNoLoadImage] = useState<boolean>(false);
-
-    return (
-        <div key={u.id} className="bg-slate-900 border border-slate-700 p-5 rounded-2xl text-center space-y-4 flex flex-col justify-between">
-            <div className="flex flex-col items-center space-y-3">
-                <Image
-                    src={u.photo_url == undefined || (u.photo_url != undefined && !u.photo_url.includes('jpg') && !u.photo_url.includes('png') && !u.photo_url.includes('jpeg')) || noLoadImage ? '/images/default_icon.png' : u.photo_url}
-                    className="rounded-2xl object-cover ring-2 ring-slate-800 w-16 h-16"
-                    width={64}
-                    height={64}
-                    alt={u.name}
-                    unoptimized
-                    decoding='async'
-                    onErrorCapture={() => {
-                        setNoLoadImage(true);
-                    }}
-                />
-                <div>
-                    <h3 className="font-bold text-white text-base">{u.name}</h3>
-                    <span className="text-xs text-slate-400 font-medium block">@{u.username}</span>
-                </div>
-                <p className="text-xs text-slate-400 font-medium italic min-h-[32px] max-w-[180px] line-clamp-2">
-                    &ldquo;{u.description || 'Disposto a vencer todos os campeonatos!'}&rdquo;
-                </p>
-            </div>
-            <div className="grid grid-cols-3 gap-1 pt-3 border-t border-slate-800 text-[10px] text-slate-400 font-bold">
-                <div>
-                    <span className="text-slate-500 block">TORNEIOS</span>
-                    <span className="text-emerald-400 font-extrabold text-sm">{u.champs_count}</span>
-                </div>
-                <div>
-                    <span className="text-slate-500 block">JOGOS</span>
-                    <span className="text-indigo-400 font-extrabold text-sm">{u.matches_played}</span>
-                </div>
-                <div>
-                    <span className="text-slate-500 block">GOLS</span>
-                    <span className="text-rose-400 font-extrabold text-sm">{u.goals}</span>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-function PlayersTab2() {
-    const { addQueryLog } = useApp();
-    const [players, setPlayers] = useState<PlayerStats[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const loadPlayers = useCallback(async () => {
-        setLoading(true);
-        try {
-            const data = await apiClient<{ players: PlayerStats[] }>('/api/players');
-            setPlayers(data.players);
-            addQueryLog('LIST PLAYERS PROFILES', 'SELECT u.*, COUNT(cp), SUM(goals) FROM users u LEFT JOIN ...');
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    }, [addQueryLog]);
-
-    useEffect(() => { loadPlayers(); }, [loadPlayers]);
-
-    return (
-        <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-extrabold text-white">Galeria de Jogadores</h1>
-                    <p className="text-slate-400 text-sm">Explore os perfis individuais de todos os jogadores cadastrados no sistema.</p>
-                </div>
-            </div>
-
-            {loading ? (
-                <div className="text-center py-16 text-slate-500">
-                    <i className="fa-solid fa-circle-notch fa-spin text-3xl mb-2" />
-                    <p className="text-sm">Carregando jogadores...</p>
-                </div>
-            ) : players.length === 0 ? (
-                <div className="text-center py-16 text-slate-500 border-2 border-dashed border-slate-700 rounded-2xl">
-                    <i className="fa-solid fa-users text-4xl mb-3" />
-                    <p className="font-semibold">Nenhum jogador cadastrado.</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {players.map((u, i) => (
-                        <IconPlayer key={i} u={u} />
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
 
 export function PlayersTab() {
     const { addQueryLog } = useApp();
@@ -132,7 +36,14 @@ export function PlayersTab() {
         }
     }, [players])
 
-    console.log(playerSelected);
+    if(loading){
+        return (
+          <div className="text-center py-12 text-slate-500">
+            <i className="fa-solid fa-circle-notch fa-spin text-3xl mb-2" />
+            <p className="text-sm">Carregando...</p>
+          </div>
+        )
+    }
 
     return (
         <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6">
@@ -214,20 +125,20 @@ export function PlayersTab() {
                                         </div>
                                         <p className="text-sm text-slate-400" id="active-handle">@{playerSelected.username}</p>
                                         <p className="text-xs italic text-accentGreen/90 bg-accentGreen/5 px-3 py-1.5 rounded-xl border border-accentGreen/10 inline-block mt-2" id="active-quote">
-                                            "{playerSelected.description}"
+                                            &quot;{playerSelected.description}&quot;
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="w-full md:w-auto flex flex-col sm:flex-row gap-2">
-                                    <button onClick={() => { }} className="bg-[#0d1527] hover:bg-cardHover border border-borderBlue text-slate-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+                                    <button onClick={() => { window.print(); }} className="bg-[#0d1527] hover:bg-cardHover border border-borderBlue text-slate-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                         Exportar Perfil
                                     </button>
-                                    <button onClick={() => { }} className="bg-accentGreen hover:bg-emerald-400 text-darkBg px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all">
+                                    {/* <button onClick={() => { }} className="bg-accentGreen hover:bg-emerald-400 text-darkBg px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
                                         Simular Novo Golo
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
                         </div>
@@ -278,13 +189,13 @@ export function PlayersTab() {
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z" /></svg>
                                     </div>
                                 </div>
-                                <p className="text-3xl font-extrabold text-white" id="stat-rebaixamentos">0</p>
+                                <p className="text-3xl font-extrabold text-white" id="stat-rebaixamentos">{playerSelected.championships != null && playerSelected.championships != undefined? playerSelected.championships.split(",").filter(x => x.toLowerCase().includes('rebaixado')).length : 0}</p>
                                 <p className="text-[10px] text-slate-500 mt-1" id="stat-despromocoes-status">Nível estável na liga</p>
                             </div>
 
                         </div>
 
-                        <div className="flex flex-row gap-4 w-full">
+                        {/* <div className="flex flex-row gap-4 w-full">
 
                             <div className="bg-[#0b111e] rounded-3xl border border-borderBlue p-6 lg:col-span-3 flex flex-col gap-4 w-full">
                                 <div>
@@ -340,7 +251,7 @@ export function PlayersTab() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="bg-gradient-to-b from-[#111a2e] to-[#0d1627] rounded-3xl border border-borderBlue p-6 flex flex-col gap-6 shadow-2xl">
                             <div className="flex flex-col md:flex-row items-center gap-6 border-b border-[#1e2d4a]/40 pb-5">
@@ -362,8 +273,6 @@ export function PlayersTab() {
                                 {
                                     playerSelected.championships != undefined ?
                                         playerSelected.championships.split(',').map((x, index) => {
-                                            console.log(x.toLowerCase().includes('inviolável'));
-
                                             if (x.toLowerCase().includes('vencedor')) {
                                                 return (
                                                     <div key={index} className="trophy-card bg-gradient-to-b from-amber-600/20 via-amber-900/30 to-amber-500/10 border-amber-500/30 text-amber-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[140px] shadow-lg hover:border-amber-400/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5" title="Champions Cup T1">

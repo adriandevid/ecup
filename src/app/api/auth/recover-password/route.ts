@@ -1,6 +1,6 @@
 import { query, queryOne } from '@/lib/db';
+import { sendEmail } from '@/lib/email';
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
 export async function POST(req: NextRequest) {
     const { email } = await req.json();
@@ -31,11 +31,8 @@ export async function POST(req: NextRequest) {
         [aleatoryHash, expirationDate, email]
     );
 
-
-    const resend = new Resend(process.env.EMAIL_TOKEN);
-
-    await resend.emails.send({
-        from: 'onboarding@resend.dev',
+    sendEmail({
+        from: 'adriandevid36@gmail.com',
         to: email,
         subject: 'Recuperação de Senha do sistema Ecup',
         html: `

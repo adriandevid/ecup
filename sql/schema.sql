@@ -62,6 +62,37 @@ CREATE TABLE IF NOT EXISTS "reset_tokens" (
 	email text not null
 );
 
+CREATE TABLE IF NOT EXISTS insignias(
+	id serial4 not null primary key,
+	goals int null,
+	greater_than_gols bool null,
+	less_than_gols bool null,
+	--
+	matches_played int null,
+	greater_than_matches_played bool null,
+	less_than_matches_played bool null,
+	--
+	goals_conceded int null,
+	greater_than_goals_conceded bool null,
+	less_than_goals_conceded bool null,
+	--
+	championship int null,
+	greater_than_championship bool null,
+	less_than_championship bool null,
+	--
+	mutiple_championship bool default true  not null, -- para quantificar em multiplos campeonatos ou em algum campeonato,
+	path_image text not null --https://raw.githubusercontent.com/adriandevid/ecup-insignias/refs/heads/master/{name}.png
+);
+
+
+CREATE TABLE IF NOT EXISTS milestones_achieveds(
+	id serial4 not null primary key,
+	insignia_id int4 not null,
+	user_id int4 not null,
+	constraint insignia_id_fkey foreign key (insignia_id) references insignias(id),
+	constraint user_id_fkey foreign key (insignia_id) references users(id)
+)
+
 
 -- Índices para melhorar performance
 CREATE INDEX IF NOT EXISTS idx_matches_championship ON matches(championship_id);
