@@ -16,9 +16,8 @@ export async function sendEmail(form: {
         },
     });
 
-    try {
-        await transporter.sendMail(form);
-    } catch (error) {
-        console.error("Error sending email:", error);
+   const senderEmail = await transporter.sendMail(form);
+    if(senderEmail.rejected) {
+        throw new Error(senderEmail.response);
     }
 }
