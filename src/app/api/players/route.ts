@@ -90,8 +90,8 @@ export async function GET() {
               case
                 when i.matches_played is not null then
                   case
-                    when i.greater_than_matches_played then player_stats.champs_count >= i.matches_played
-                    when i.less_than_matches_played then player_stats.champs_count <= i.matches_played
+                    when i.greater_than_matches_played then player_stats.matches_played >= i.matches_played
+                    when i.less_than_matches_played then player_stats.matches_played <= i.matches_played
                     else false
                   end
                 else true

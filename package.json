@@ -10,6 +10,7 @@
     "db:setup": "node -e \"require('fs').readFileSync('sql/schema.sql','utf8').split(';').forEach(s=>s.trim()&&require('child_process').execSync('psql '+process.env.DATABASE_URL+' -c \"'+s.trim().replace(/\"/g,'\\\\\"')+'\"',{stdio:'inherit'}))\""
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "jose": "^5.9.6",
