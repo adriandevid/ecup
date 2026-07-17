@@ -45,6 +45,12 @@ export interface PlayerStats {
   goals: number;
   championships: string;
   goals_conceded: number;
+  milestones_achieveds: {
+    id: number;
+    title: string;
+    description: string;
+    path_image: string;
+  }[] | undefined;
 }
 
 export interface Standings {

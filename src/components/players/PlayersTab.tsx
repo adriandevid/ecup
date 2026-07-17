@@ -36,12 +36,12 @@ export function PlayersTab() {
         }
     }, [players])
 
-    if(loading){
+    if (loading) {
         return (
-          <div className="text-center py-12 text-slate-500">
-            <i className="fa-solid fa-circle-notch fa-spin text-3xl mb-2" />
-            <p className="text-sm">Carregando...</p>
-          </div>
+            <div className="text-center py-12 text-slate-500">
+                <i className="fa-solid fa-circle-notch fa-spin text-3xl mb-2" />
+                <p className="text-sm">Carregando...</p>
+            </div>
         )
     }
 
@@ -189,14 +189,13 @@ export function PlayersTab() {
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z" /></svg>
                                     </div>
                                 </div>
-                                <p className="text-3xl font-extrabold text-white" id="stat-rebaixamentos">{playerSelected.championships != null && playerSelected.championships != undefined? playerSelected.championships.split(",").filter(x => x.toLowerCase().includes('rebaixado')).length : 0}</p>
+                                <p className="text-3xl font-extrabold text-white" id="stat-rebaixamentos">{playerSelected.championships != null && playerSelected.championships != undefined ? playerSelected.championships.split(",").filter(x => x.toLowerCase().includes('rebaixado')).length : 0}</p>
                                 <p className="text-[10px] text-slate-500 mt-1" id="stat-despromocoes-status">Nível estável na liga</p>
                             </div>
 
                         </div>
 
-                        {/* <div className="flex flex-row gap-4 w-full">
-
+                        <div className="flex flex-row gap-4 w-full">
                             <div className="bg-[#0b111e] rounded-3xl border border-borderBlue p-6 lg:col-span-3 flex flex-col gap-4 w-full">
                                 <div>
                                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -204,54 +203,28 @@ export function PlayersTab() {
                                     </h3>
                                     <p className="text-xs text-slate-400">Conquistas especiais desbloqueadas ao cumprir objetivos no relvado.</p>
                                 </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" id="badges-container">
-                                    <div className="p-3 rounded-2xl border border-amber-500/40 bg-[#17253d] flex items-center gap-3 transition-all opacity-100">
-                                        <div className="w-12 h-12 rounded-xl bg-[#1b2b48] flex items-center justify-center text-2xl shrink-0 border border-white/5 relative">
-                                            ⚽
-                                            <span className="absolute -top-1 -right-1 text-xs text-accentGreen">✓</span>
-                                        </div>
-                                        <div className="leading-tight">
-                                            <h4 className="font-extrabold text-sm text-white">Bota de Ouro</h4>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">Mais de 30 Gols marcados na liga.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-3 rounded-2xl border border-amber-500/40 bg-[#17253d] flex items-center gap-3 transition-all opacity-100">
-                                        <div className="w-12 h-12 rounded-xl bg-[#1b2b48] flex items-center justify-center text-2xl shrink-0 border border-white/5 relative">
-                                            🛡️
-                                            <span className="absolute -top-1 -right-1 text-xs text-accentGreen">✓</span>
-                                        </div>
-                                        <div className="leading-tight">
-                                            <h4 className="font-extrabold text-sm text-white">Firme e Hirto</h4>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">Completar um torneio sem derrotas.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-3 rounded-2xl border border-amber-500/40 bg-[#17253d] flex items-center gap-3 transition-all opacity-100">
-                                        <div className="w-12 h-12 rounded-xl bg-[#1b2b48] flex items-center justify-center text-2xl shrink-0 border border-white/5 relative">
-                                            🎩
-                                            <span className="absolute -top-1 -right-1 text-xs text-accentGreen">✓</span>
-                                        </div>
-                                        <div className="leading-tight">
-                                            <h4 className="font-extrabold text-sm text-white">Senhor Hat-Trick</h4>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">Marcar 3 ou mais Gols no mesmo jogo.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-3 rounded-2xl border border-amber-500/40 bg-[#17253d] flex items-center gap-3 transition-all opacity-100">
-                                        <div className="w-12 h-12 rounded-xl bg-[#1b2b48] flex items-center justify-center text-2xl shrink-0 border border-white/5 relative">
-                                            🚀
-                                            <span className="absolute -top-1 -right-1 text-xs text-accentGreen">✓</span>
-                                        </div>
-                                        <div className="leading-tight">
-                                            <h4 className="font-extrabold text-sm text-white">Intocável</h4>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">Zero despromoções na carreira ativa.</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                {
+                                    playerSelected.milestones_achieveds ?
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" id="badges-container">
+                                            {
+                                                playerSelected.milestones_achieveds ?
+                                                    playerSelected.milestones_achieveds.map(insignia => (
+                                                        <div key={insignia.id} className="p-3 rounded-2xl border border-amber-500/40 bg-[#17253d] flex items-center gap-3 transition-all opacity-100">
+                                                            <div className="w-12 h-12 rounded-xl bg-[#1b2b48] flex items-center justify-center text-2xl shrink-0 border border-white/5 relative">
+                                                                <img src={insignia.path_image} alt="" />
+                                                                <span className="absolute -top-1 -right-1 text-xs text-accentGreen">✓</span>
+                                                            </div>
+                                                            <div className="leading-tight">
+                                                                <h4 className="font-extrabold text-sm text-white">{insignia.title}</h4>
+                                                                <p className="text-[10px] text-slate-400 mt-0.5">{insignia.description}</p>
+                                                            </div>
+                                                        </div>
+                                                    )) : <></>
+                                            }
+                                        </div> : <p className='text-center w-full text-sm'>😒Começe as disputas</p>
+                                }
                             </div>
-                        </div> */}
+                        </div>
 
                         <div className="bg-gradient-to-b from-[#111a2e] to-[#0d1627] rounded-3xl border border-borderBlue p-6 flex flex-col gap-6 shadow-2xl">
                             <div className="flex flex-col md:flex-row items-center gap-6 border-b border-[#1e2d4a]/40 pb-5">
@@ -317,7 +290,7 @@ export function PlayersTab() {
                                                 )
                                             } else if (x.toLowerCase().includes('rebaixado')) {
                                                 return (
-                                                    <div key={index}  className="relegation-card bg-gradient-to-b from-red-950 via-red-900 to-black border-red-500 text-red-200 border-2 p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-2xl hover:scale-105 transition-all duration-300">
+                                                    <div key={index} className="relegation-card bg-gradient-to-b from-red-950 via-red-900 to-black border-red-500 text-red-200 border-2 p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-2xl hover:scale-105 transition-all duration-300">
                                                         <div className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#1b080b] border-2 border-red-500 shadow-inner mb-2">
                                                             <span className="text-3xl filter drop-shadow">💀</span>
                                                         </div>
@@ -330,24 +303,24 @@ export function PlayersTab() {
                                                         </div>
                                                     </div>
                                                 )
-                                            } else if(x.toLowerCase().includes('inviolável')) {
-                                               return (
-                                                 <div key={index} className="trophy-card bg-gradient-to-b from-slate-800/10 via-slate-900/10 to-slate-950/10 border-slate-700/20 text-slate-500 opacity-40 filter grayscale border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Medalha de Consistência">
-                                                    <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
-                                                        <span className="text-2xl filter drop-shadow">⚪</span>
-                                                    </div>
-                                                    <div className="leading-none mt-1 w-full flex flex-col items-center">
-                                                        <span className="text-[9px] uppercase font-black tracking-widest block opacity-95">Meio Tabela</span>
-                                                        <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Medalha de Consistência">{x}</span>
-                                                        <span className="text-[9px] text-slate-400 block mt-1 font-medium">Sem registos</span>
-                                                        
-                                                        <div className="bg-slate-800/30 text-slate-400 border border-slate-700/20 text-[9px] font-black tracking-wider px-2 py-0.5 rounded-full mt-2 inline-block">
-                                                            Sem registos
+                                            } else if (x.toLowerCase().includes('inviolável')) {
+                                                return (
+                                                    <div key={index} className="trophy-card bg-gradient-to-b from-slate-800/10 via-slate-900/10 to-slate-950/10 border-slate-700/20 text-slate-500 opacity-40 filter grayscale border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Medalha de Consistência">
+                                                        <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-[#0d1527] border border-white/5 mb-2 shadow-inner">
+                                                            <span className="text-2xl filter drop-shadow">⚪</span>
                                                         </div>
-                                                    
+                                                        <div className="leading-none mt-1 w-full flex flex-col items-center">
+                                                            <span className="text-[9px] uppercase font-black tracking-widest block opacity-95">Meio Tabela</span>
+                                                            <span className="text-[11px] text-white font-extrabold truncate w-full block mt-1.5" title="Medalha de Consistência">{x}</span>
+                                                            <span className="text-[9px] text-slate-400 block mt-1 font-medium">Sem registos</span>
+
+                                                            <div className="bg-slate-800/30 text-slate-400 border border-slate-700/20 text-[9px] font-black tracking-wider px-2 py-0.5 rounded-full mt-2 inline-block">
+                                                                Sem registos
+                                                            </div>
+
+                                                        </div>
                                                     </div>
-                                                </div>
-                                               )
+                                                )
                                             }
                                             return (
                                                 <div key={index} className="trophy-card dispute-card bg-gradient-to-b from-blue-600/15 via-blue-900/25 to-blue-950/5 border-dashed border-blue-500/30 text-blue-400 border p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[155px] shadow-lg hover:scale-105 hover:shadow-black/35 transition-all duration-300" title="Ecup Masters T5">
