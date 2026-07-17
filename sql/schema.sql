@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS "reset_tokens" (
 
 CREATE TABLE IF NOT EXISTS insignias(
 	id serial4 not null primary key,
+    title varchar(100) not null,
+	description varchar(300) not null,
 	goals int null,
 	greater_than_gols bool null,
 	less_than_gols bool null,
