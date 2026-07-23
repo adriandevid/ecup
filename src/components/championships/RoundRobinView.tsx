@@ -3,9 +3,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { apiClient } from '@/lib/api';
-import { Match, Standings } from '@/types';
+import { Match, PlayerStanding, Standings } from '@/types';
 import { cn } from '@/lib/tailwindcss';
 import Image from 'next/image';
+import ProfileChampionship from './ProfileChampionship';
 
 interface Props {
   champId: number;
@@ -53,6 +54,7 @@ export function RoundRobinView({ champId }: Props) {
   const [standings, setStandings] = useState<Standings[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [maxRound, setMaxRound] = useState(1);
+  const [loading, isLoading] = useState<boolean>(false);
   const [selectedRound, setSelectedRound] = useState(1);
   const [scores, setScores] = useState<Record<number, { home: string; away: string }>>({});
 
@@ -66,19 +68,43 @@ export function RoundRobinView({ champId }: Props) {
 
   const loadMatches = useCallback(async (round: number) => {
     try {
+      isLoading(true);
       const data = await apiClient<{ matches: Match[]; maxRound: number }>(
         `/api/championships/${champId}/matches?round=${round}`
       );
       setMatches(data.matches);
       setMaxRound(data.maxRound);
       addQueryLog('FILTER ROUND MATCHES', `SELECT m.*, u1.name, u2.name FROM matches WHERE championship_id = ${champId} AND round = ${round}`);
-    } catch (err) { console.error(err); }
+      isLoading(false);
+    } catch (err) {
+      isLoading(false);
+      console.error(err);
+    }
   }, [champId, addQueryLog]);
+
+
+  const loadPlayerStanding = async (player_id: number) => {
+    try {
+      isLoading(true);
+
+      const data = await apiClient<PlayerStanding>(
+        `/api/championships/${champId}/standings/${player_id}`
+      );
+
+      isLoading(false);
+      setStandingSelectedPlayer(data);
+      showModalChampionship(true);
+    } catch (err) {
+      isLoading(false);
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     loadStandings();
     loadMatches(selectedRound);
   }, [loadStandings, loadMatches, selectedRound]);
+
 
   async function saveScore(matchId: number) {
     const s = scores[matchId];
@@ -92,6 +118,7 @@ export function RoundRobinView({ champId }: Props) {
       return;
     }
     try {
+      isLoading(true);
       await apiClient(`/api/matches/${matchId}`, {
         method: 'PUT',
         body: JSON.stringify({ homeScore: home, awayScore: away }),
@@ -103,6 +130,7 @@ export function RoundRobinView({ champId }: Props) {
 
       await loadStandings();
       await loadMatches(selectedRound);
+      isLoading(false);
 
       if (socket) {
         const match = matches.filter(x => x.id == matchId)[0];
@@ -110,24 +138,44 @@ export function RoundRobinView({ champId }: Props) {
       }
 
     } catch (err) {
+      isLoading(false);
       showToast('Erro', (err as Error).message, 'error');
     }
   }
 
   async function resetScore(matchId: number) {
     try {
+      isLoading(true);
       await apiClient(`/api/matches/${matchId}/reset`, { method: 'PUT' });
       addQueryLog('EDIT RESULT', `UPDATE matches SET played = false WHERE id = ${matchId}`);
       await loadStandings();
       await loadMatches(selectedRound);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      isLoading(false);
+      console.error(err); 
+    }
   }
+
+
+  const [openModalChampionship, showModalChampionship] = useState<boolean>(false);
+  const [standingSelectedPlayer, setStandingSelectedPlayer] = useState<PlayerStanding | undefined>();
 
   const rounds = Array.from({ length: maxRound }, (_, i) => i + 1);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Standings */}
+      {
+        loading && (
+          <div className='fixed top-0 left-0 w-full h-full bg-black/[.3]'>
+            <div className='flex flex-row justify-center items-center w-full h-full'>
+              <div className="text-center py-12 text-white">
+                <i className="fa-solid fa-circle-notch fa-spin text-3xl mb-2" />
+                <p className="text-sm">Carregando...</p>
+              </div>
+            </div>
+        </div>
+        )
+      }
       <div className="lg:col-span-7 space-y-4">
         <h3 className="font-bold text-white text-base flex items-center gap-2">
           <i className="fa-solid fa-star text-emerald-400" /> Classificação Geral
@@ -153,10 +201,11 @@ export function RoundRobinView({ champId }: Props) {
                 const sg = row.goals_for - row.goals_against;
                 return (
                   <tr
+                    onClick={() => loadPlayerStanding(row.pid)}
                     key={row.pid}
                     className={
                       cn(
-                        "border-b border-slate-800 transition",
+                        "border-b border-slate-800 transition cursor-pointer",
                         pos < 3 ? "hover:bg-green-300/50 bg-emerald-400/[.5]" :
                           pos >= (standings.length - 2) ?
                             "hover:bg-red-300/50 bg-red-400/[.5]" :
@@ -258,6 +307,7 @@ export function RoundRobinView({ champId }: Props) {
           ))}
         </div>
       </div>
+      <ProfileChampionship open={openModalChampionship} playerStanding={standingSelectedPlayer} />
     </div>
   );
 }

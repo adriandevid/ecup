@@ -66,6 +66,11 @@ export interface Standings {
   goals_against: number;
 }
 
+export interface PlayerStanding extends Standings {
+  matches: Match[],
+  position: number
+}
+
 export interface DashboardStats {
   activeChampionships: number;
   totalPlayers: number;
