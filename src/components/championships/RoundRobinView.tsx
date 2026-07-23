@@ -207,7 +207,7 @@ export function RoundRobinView({ champId }: Props) {
                       cn(
                         "border-b border-slate-800 transition cursor-pointer",
                         pos < 3 ? "hover:bg-green-300/50 bg-emerald-400/[.5]" :
-                          pos >= (standings.length - 2) ?
+                          pos >= (standings.length - 4) ?
                             "hover:bg-red-300/50 bg-red-400/[.5]" :
                             "hover:bg-slate-800/50"
                       )
