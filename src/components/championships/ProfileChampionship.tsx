@@ -144,7 +144,7 @@ export default function ProfileChampionship({ open, playerStanding }: { open: bo
                                 <div className="flex items-center justify-between gap-2 py-1">
                                     <div className="flex items-center gap-2.5 flex-1 min-w-0 ">
                                         <img src={matche.home_photo} className="w-8 h-8 rounded-full bg-slate-800 border border-emerald-500 ring-2 ring-emerald-500/30 flex-shrink-0" alt={matche.home_name} />
-                                        <span className="text-xs font-bold truncate text-slate-200">estoura caneco</span>
+                                        <span className={cn("text-xs font-bold truncate", matche.home_user_id == playerStanding?.pid ? "text-emerald-400 font-extrabold" : "text-slate-200")}>{matche.home_name}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0F1623] rounded-lg border border-slate-800 flex-shrink-0 font-extrabold text-sm">
@@ -153,7 +153,7 @@ export default function ProfileChampionship({ open, playerStanding }: { open: bo
                                         <span className="text-slate-200">{matche.away_score}</span>
                                     </div>
                                     <div className="flex items-center justify-end gap-2.5 flex-1 min-w-0 text-right text-emerald-400 font-bold">
-                                        <span className="text-xs font-bold truncate text-emerald-400 font-extrabold">Vicente costa</span>
+                                        <span className={cn("text-xs font-bold truncate", matche.away_user_id == playerStanding?.pid ? "text-emerald-400 font-extrabold" : "text-slate-200")}>{matche.away_name}</span>
                                         <img src={matche.away_photo} className="w-8 h-8 rounded-full bg-slate-800 border border-emerald-500 ring-2 ring-emerald-500/30 flex-shrink-0" alt={matche.away_name} />
                                     </div>
                                 </div>
