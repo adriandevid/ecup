@@ -2,8 +2,11 @@ const a = require("ppu-paddle-ocr");
 const fs = require("fs");
 const sharp = require("sharp");
 
+
+
 const positionsPtBr = [
     "GO", // Goleiro
+    "G0",
     "ZC",  // Zagueiro Central
 
     "LE",  // Lateral Esquerdo
@@ -23,22 +26,25 @@ const positionsPtBr = [
     "CA"   // Centroavante
 ];
 
+function isValidNumber(str) {
+  return typeof str === 'string' && str.trim() !== '' && Number.isFinite(Number(str));
+}
 
 (async () => {
     const ocr = new a.PaddleOcrService();
 
     await ocr.initialize();
 
-    const buffer = fs.readFileSync("/home/adriandevid/Downloads/test1.png");
+    const buffer = fs.readFileSync("./test-a.png");
 
     const processed = await sharp(buffer)
         .grayscale()          // remove cores
-        .normalize()          // aumenta contraste
+        .normalize()
         .resize({
-            width: 3000,
+            width: 4000,
             kernel: sharp.kernel.lanczos3
         })
-        .sharpen()            // melhora definição das letras
+        .sharpen()
         .toBuffer();
 
     const arrayBuffer = processed.buffer.slice(
@@ -46,12 +52,17 @@ const positionsPtBr = [
         processed.byteOffset + processed.byteLength
     );
 
+    // await fs.writeFile("/test-a.png", processed.buffer);
+    // const buffer2 = Buffer.from(arrayBuffer);
+    // const writeStream = fs.createWriteStream("./test-a.png");
+    
+    // writeStream.write(buffer2);
+    // writeStream.end();
     const result = await ocr.recognize(arrayBuffer);
     const datas = result.lines;
 
-    //console.log(datas);
     var cardPersonSelected;
-    var search = "Johan Cruyff";
+    var search = "Erling Haaland";
     var baseCard = datas.filter(x => x.filter(a => a.text == search).length > 0).map(x => x.filter(a => a.text == search)[0])[0];
 
     var positions = [];
@@ -61,17 +72,19 @@ const positionsPtBr = [
             if (positionsPtBr.includes(element.text.toUpperCase())) {
                 positions.push(element);
             } else if (element.text.length <= 3) {
-                if (positionsPtBr.filter(pos => element.text.includes(pos)).length > 0) {
+                if (positionsPtBr.filter(pos => element.text.toUpperCase().includes(pos)).length > 0) {
                     positions.push(element)
                 }
             }
         })
     })
-    var overhalls = datas.filter(x => x.filter(a => /\d/.test(a.text)).length > 0).map(x => x.filter(a => /\d/.test(a.text))[0]);
+    var overhalls = datas.filter(x => x.filter(a => isValidNumber(a.text)).length > 0).map(x => x.filter(a => isValidNumber(a.text))[0]);
 
-    console.log("base card: ", baseCard);
-    console.log("positions", positions);
-    //console.log("overhalls", overhalls);
+    // console.log("base card: ", baseCard);
+    // console.log("positions", positions);
+    // console.log(datas)
+    console.log("overhalls", overhalls);
+
 
     await ocr.destroy();
 })();

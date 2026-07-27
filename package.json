@@ -9,10 +9,15 @@
     "lint": "next lint",
     "db:setup": "node -e \"require('fs').readFileSync('sql/schema.sql','utf8').split(';').forEach(s=>s.trim()&&require('child_process').execSync('psql '+process.env.DATABASE_URL+' -c \"'+s.trim().replace(/\"/g,'\\\\\"')+'\"',{stdio:'inherit'}))\""
   },
+  "opencv4nodejs": {
+    "disableAutoBuild": "1"
+  },
   "dependencies": {
     "@paddleocr/paddleocr-js": "^0.4.2",
+    "@techstark/opencv-js": "^5.0.0-release.1",
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^2.4.3",
+    "canvas": "^3.2.3",
     "clsx": "^2.1.1",
     "fs": "^0.0.1-security",
     "jose": "^5.9.6",
