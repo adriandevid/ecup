@@ -78,7 +78,7 @@ export interface DashboardStats {
   totalGoals: number;
 }
 
-export type TabId = 'auth' | 'dashboard' | 'championships' | 'profiles' | 'console';
+export type TabId = 'auth' | 'dashboard' | 'championships' | 'profiles' | 'console' | 'profile';
 
 export interface ToastState {
   title: string;
@@ -98,3 +98,6 @@ export interface Permission {
   role_id: number;
   user_id: number;
 }
+
+export type ObjectTextOCR = { poly: number[][], text: string, score: number };
+export type Card = { name: string, position?: string | undefined, overall?: number | undefined };

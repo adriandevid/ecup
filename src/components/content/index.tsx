@@ -12,6 +12,7 @@ import { ConsoleTab } from '@/components/console/ConsoleTab';
 import { CreateChampionshipModal } from '@/components/championships/CreateChampionshipModal';
 import UpdateProfile from '@/components/auth/updateProfileModal';
 import ChatModal from '@/components/chat/chatModal';
+import Profile from '../profile';
 
 export default function AppContent() {
   const { currentUser, activeTab } = useApp();
@@ -30,6 +31,7 @@ export default function AppContent() {
             <div className={activeTab === 'championships' ? '' : 'hidden'}><ChampionshipsTab /></div>
             <div className={activeTab === 'profiles'      ? '' : 'hidden'}><PlayersTab /></div>
             <div className={activeTab === 'console'       ? '' : 'hidden'}><ConsoleTab /></div>
+            <div className={activeTab === 'profile'       ? '' : 'hidden'}><Profile /></div>
           </>
         )}
       </main>

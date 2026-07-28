@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { PaddleOCR } from "@paddleocr/paddleocr-js";
+import { Card, ObjectTextOCR } from "@/types";
 
 function isValidNumber(str: string) {
   return typeof str === 'string' && str.trim() !== '' && Number.isFinite(Number(str));
 }
 
-export type ObjectTextOCR = { poly: number[][], text: string, score: number };
-export type Card = { name: string, position?: string | undefined, overall?: number | undefined };
 
 export default function App() {
 
@@ -18,31 +17,7 @@ export default function App() {
 
   const [loading, isLoading] = useState<boolean>(false);
 
-  var namesCase = ["posse", "bola"];
-
-  const loadCardsOfTeam = (datas: ObjectTextOCR[]) => {
-    var cards: Card[] = [];
-    var names = datas.filter(x => x.text.length > 4 && /^[\p{L}\s]+$/u.test(x.text.replaceAll(" ", "")));
-
-    names.forEach(x => {
-      if (x.text.split(" ").filter(t => namesCase.includes(t)).length == 0) {
-        var card = searchCard(datas, x.text);
-        if (card.overall) {
-          cards.push(searchCard(datas, x.text));
-        }
-      }
-    })
-
-    console.log(cards)
-  }
-
-  const searchCard = (datas: ObjectTextOCR[], playerName: string) => {
-    var baseCard = datas.filter(x => x.text == playerName).sort((a, b) => a.score + b.score)[0];
-    var card: { name: string, position?: string | undefined, overall?: number | undefined } = {
-      name: baseCard.text
-    }
-
-    const positionsPtBr = [
+  const positionsPtBr = [
       "GOL", // Goleiro
       "GO",
       "ZC",  // Zagueiro Central
@@ -59,33 +34,73 @@ export default function App() {
       "CA"   // Centroavante
     ];
 
-    var rowCards: any[] = datas.map((element) => ({
-      data: element,
-      betweenAxisY: baseCard.poly[0][1] - element.poly[0][1]
-    }))
-      .filter(x => x.betweenAxisY > 0 && x.data.text.length >= 2);
+  var taticalSetupNamespaces = [
+    {
+      title: "Posse de bola",
+      splited: ["posse", "bola"]
+    }
+  ];
 
-    rowCards = rowCards.map(x => ({
-      data: x.data,
-      betweenAxisY: x.betweenAxisY,
-      betweenAxisX: baseCard.poly[0][0] - x.data.poly[0][0]
-    })).filter(x => x.betweenAxisX > 0)
+  const loadCardsOfTeam = (datas: ObjectTextOCR[]) : Card[] => {
+    var cards: Card[] = [];
+    var names = datas.filter(x => x.text.length > 4 && /^[\p{L}\s]+$/u.test(x.text.replaceAll(" ", "")));
 
-    const tolerance = 10;
-
-    rowCards = rowCards.sort((a, b) => {
-      if (Math.abs(a.betweenAxisY - b.betweenAxisY) <= tolerance) {
-        return a.betweenAxisX - b.betweenAxisX;
+    names.forEach(x => {
+      if (x.text.split(" ").filter(t => taticalSetupNamespaces.filter(s => s.splited.includes(t)).length > 0).length == 0) {
+        var card = searchCard(datas, x.text);
+        if (card.overall) {
+          cards.push(searchCard(datas, x.text));
+        }
       }
-
-      return a.betweenAxisY - b.betweenAxisY;
     })
 
-    var positionCoordinates = rowCards.filter(x => positionsPtBr.includes(x.data.text.toUpperCase()))[0];
-    var overallCoordinates = rowCards.filter(x => isValidNumber(x.data.text))[0];
+    return cards;
+  }
 
-    card.position = positionCoordinates.data.text;
-    card.overall = parseInt(overallCoordinates.data.text);
+
+  const searhTraining = (datas: ObjectTextOCR[]) => {
+    return datas.filter(x => x.text.split("-").length == 4)[0].text
+  }
+
+  const searchTaticalSetup = (datas: ObjectTextOCR[]) => {
+    var name;
+    
+    datas.forEach(x => {
+      var nameSplited = x.text.split(" ");
+
+      nameSplited.forEach(t => {
+        var search = taticalSetupNamespaces.filter(s => s.splited.includes(t));
+        if(search.length > 0) {
+          name = search[0].title
+        }
+      })
+    })
+
+    return name;
+  }
+
+  const searchCard = (datas: ObjectTextOCR[], playerName: string) => {
+    var baseCard = datas.filter(x => x.text == playerName).sort((a, b) => a.score + b.score)[0];
+    var card: { name: string, position?: string | undefined, overall?: number | undefined } = {
+      name: baseCard.text
+    }
+
+    var heigthRowCards = datas.filter(x => (baseCard.poly[0][1] - x.poly[0][1]) > 0);
+    var heigthRowCardsAroundBaseCard = heigthRowCards.map(x => ({
+      c: x,
+      axisX: baseCard.poly[0][0] - x.poly[0][0],
+      axisY: baseCard.poly[0][1] - x.poly[0][1],
+      around: (baseCard.poly[0][0] - x.poly[0][0]) + (baseCard.poly[0][1] - x.poly[0][1])
+    })).filter(x => x.axisX > 0).sort((a, b)=> a.around - b.around)
+
+    var positionCoordinates = heigthRowCardsAroundBaseCard
+      .filter(x => positionsPtBr.includes(x.c.text.toUpperCase()))[0];
+
+    var overallCoordinates = heigthRowCardsAroundBaseCard
+      .filter(x => isValidNumber(x.c.text))[0];
+
+    card.position = positionCoordinates.c.text;
+    card.overall = parseInt(overallCoordinates.c.text);
 
     return card;
   }
@@ -147,8 +162,12 @@ export default function App() {
       const [result] = await ocr.predict(file);
 
       isLoading(false);
-      loadCardsOfTeam(result.items)
-      setTextResult(JSON.stringify(result.items));
+      console.log(searchTaticalSetup(result.items))
+      setTextResult(JSON.stringify({
+        players: loadCardsOfTeam(result.items),
+        training: searhTraining(result.items),
+        tactical_setup: searchTaticalSetup(result.items)
+      }, null, 4));
     }
   };
 
@@ -157,7 +176,7 @@ export default function App() {
       {loadingConnectionWebgpu && (<p>conectando-se ao webgpu...</p>)}
       {loading && (<p>Carregamento...</p>)}
       <input type="file" onChange={handleImage} />
-      <p>{textResult}</p>
+      <pre>{textResult}</pre>
     </div>
   )
 }

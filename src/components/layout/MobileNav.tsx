@@ -8,6 +8,7 @@ const NAV_ITEMS: { id: TabId; label: string; icon: string }[] = [
   { id: 'championships', label: 'Torneios',  icon: 'fa-solid fa-trophy' },
   { id: 'profiles',      label: 'Jogadores', icon: 'fa-solid fa-users' },
   { id: 'console',       label: 'Console',   icon: 'fa-solid fa-terminal' },
+  { id: 'profile', label: 'Perfil', icon: 'fa-solid fa-user' }
 ];
 
 export function MobileNav() {
