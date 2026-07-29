@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ScanTeam from "./scan";
 import { Card } from "@/types";
 
@@ -11,6 +11,7 @@ export default function Profile() {
         training: string
         tactical_setup: string
     } | undefined>();
+    const pitchPlayersContainerRef = useRef<HTMLDivElement | null>(null);
 
     return (
         <section id="tab-perfil" className="tab-content space-y-6">
@@ -260,7 +261,7 @@ export default function Profile() {
                         <span className="text-[11px] text-slate-500">Passe o cursor sobre os atletas para ampliar</span>
                     </div>
 
-                    <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] max-h-[520px] rounded-2xl overflow-hidden border-2 border-emerald-900/60 shadow-2xl football-pitch p-4 flex flex-col justify-between">
+                    <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] max-h-[600px] rounded-2xl overflow-hidden border-2 border-emerald-900/60 shadow-2xl football-pitch p-4 flex flex-col justify-between">
 
 
                         <div className="absolute inset-3 border-2 border-white/20 rounded-lg pointer-events-none">
@@ -277,85 +278,304 @@ export default function Profile() {
 
                             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/4 h-1/12 border-t-2 border-x-2 border-white/20 rounded-t-sm"></div>
                         </div>
+                        <div id="pitch-players-container" className="relative w-full h-full z-10" ref={pitchPlayersContainerRef}>
+                            {
+                                team?.training.split("-").map((x, index) => {
+                                    if (index == 0) {
+                                        return (
+                                            <>
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase() == "LE").map(x => (
+                                                        <div
+                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                            style={{
+                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`,
+                                                                left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
+                                                            }}
+                                                        >
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
 
-                        {
-                            team && (
-                                <div id="pitch-players-container" className="relative w-full h-full z-10">
-                                    {
-                                        team.training.split("-").map((x, i) => {
-                                            if (i == 0) {
-                                                return (
-                                                    <>
-                                                        {
-                                                            team.players.filter(x => ["LE"].includes(`${x.position?.toUpperCase()}`)).map(def => (
-                                                                <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: '10%', left: '20%' }}>
-                                                                    <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                        <span>{def.overall}</span>
-                                                                        <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                            {def.position}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                        {def.name}
-                                                                    </div>
-                                                                </div>
-                                                            ))
-                                                        }
-                                                         {
-                                                            team.players.filter(x => ["ZC"].includes(`${x.position?.toUpperCase()}`)).map(def => (
-                                                                <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: '0%', left: '50%' }}>
-                                                                    <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                        <span>{def.overall}</span>
-                                                                        <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                            {def.position}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                        {def.name}
-                                                                    </div>
-                                                                </div>
-                                                            ))
-                                                        }
-                                                        {
-                                                            team.players.filter(x => ["GO"].includes(`${x.position?.toUpperCase()}`)).map(def => (
-                                                                <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: '0%', left: '50%' }}>
-                                                                    <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                        <span>{def.overall}</span>
-                                                                        <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                            {def.position}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                        {def.name}
-                                                                    </div>
-                                                                </div>
-                                                            ))
-                                                        }
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase().includes("ZC")).map((x, i) => (
+                                                        <div
+                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                            style={{
+                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`,
+                                                                left: `${i == 0 ?
+                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) :
+                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
+                                                                    }px`
+                                                            }}
+                                                        >
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
 
-                                                        {
-                                                            team.players.filter(x => ["LD"].includes(`${x.position?.toUpperCase()}`)).map(def => (
-                                                                <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: '10%', right: '20%' }}>
-                                                                    <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                        <span>{def.overall}</span>
-                                                                        <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                            {def.position}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                        {def.name}
-                                                                    </div>
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase() == "LD").map(x => (
+                                                        <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </>
+                                        )
+                                    } else if (index == 1) {
+                                        return (
+                                            <>
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase() == "MLG" || y.position?.toUpperCase() == "VOL").map((x, i) => (
+                                                        <div
+                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                            style={{
+                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.6)}px`,
+                                                                left: `${i == 0 ?
+                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) :
+                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
+                                                                    }px`
+                                                            }}
+                                                        >
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </>
+                                        )
+                                    } else if (index == 2) {
+                                        if (team?.training.split("-").length == 4) {
+                                            return (
+                                                <>
+                                                    {
+                                                        team.players.filter(y => y.position?.toUpperCase() == "MLE").map(x => (
+                                                            <div
+                                                                className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                                style={{
+                                                                    bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.4)}px`,
+                                                                    left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
+                                                                }}
+                                                            >
+                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                    <span>{x.overall}</span>
+                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                        {x.position}
+                                                                    </span>
                                                                 </div>
-                                                            ))
-                                                        }
-                                                    </>
-                                                )
-                                            }
-                                            return (<></>)
-                                        })
+                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                    {x.name}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                    {
+                                                        team.players.filter(y => y.position?.toUpperCase() == "MLD").map(x => (
+                                                            <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.4)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
+                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                    <span>{x.overall}</span>
+                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                        {x.position}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                    {x.name}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </>
+                                            )
+                                        } else {
+                                            return (
+                                                <>
+                                                    {
+                                                        team.players.filter(y => y.position?.toUpperCase() == "PTE").map(x => (
+                                                            <div
+                                                                className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                                style={{
+                                                                    bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
+                                                                    left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
+                                                                }}
+                                                            >
+                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                    <span>{x.overall}</span>
+                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                        {x.position}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                    {x.name}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
+
+                                                    {
+                                                        team.players.filter(y => y.position?.toUpperCase() == "CA" || y.position?.toUpperCase() == "SA").map((x, i) => (
+                                                            <div
+                                                                className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                                style={{
+                                                                    bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
+                                                                    left: `${i == 0 ?
+                                                                        (pitchPlayersContainerRef.current!.offsetWidth / 3) :
+                                                                        (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
+                                                                        }px`
+                                                                }}
+                                                            >
+                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                    <span>{x.overall}</span>
+                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                        {x.position}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                    {x.name}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
+
+                                                    {
+                                                        team.players.filter(y => y.position?.toUpperCase() == "PTD").map(x => (
+                                                            <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
+                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                    <span>{x.overall}</span>
+                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                        {x.position}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                    {x.name}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </>
+                                            )
+                                        }
+                                    } else {
+                                        return (
+                                            <>
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase() == "PTE").map(x => (
+                                                        <div
+                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                            style={{
+                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
+                                                                left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
+                                                            }}
+                                                        >
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase() == "CA" || y.position?.toUpperCase() == "SA").map((x, i) => (
+                                                        <div
+                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                            style={{
+                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
+                                                                left: `${i == 0 ?
+                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) :
+                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
+                                                                    }px`
+                                                            }}
+                                                        >
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+
+                                                {
+                                                    team.players.filter(y => y.position?.toUpperCase() == "PTD").map(x => (
+                                                        <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
+                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                                <span>{x.overall}</span>
+                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                    {x.position}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                                {x.name}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </>
+                                        )
                                     }
-                                </div>
-                            )
-                        }
+                                })
+                            }
+
+                            {
+                                team && (
+                                    team.players.filter(x => ["GO"].includes(`${x.position?.toUpperCase()}`)).map(def => (
+                                        <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: '0%', left: '50%' }}>
+                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                <span>{def.overall}</span>
+                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                    {def.position}
+                                                </span>
+                                            </div>
+                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                {def.name}
+                                            </div>
+                                        </div>
+                                    ))
+                                )
+                            }
+                        </div>
                     </div>
                 </div>
 
