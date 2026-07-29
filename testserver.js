@@ -35,7 +35,7 @@ function isValidNumber(str) {
 
     await ocr.initialize();
 
-    const buffer = fs.readFileSync("./test-a.png");
+    const buffer = fs.readFileSync("C:\\Users\\AdrianMS\\Downloads\\test5.png");
 
     const processed = await sharp(buffer)
         .grayscale()          // remove cores
@@ -44,6 +44,22 @@ function isValidNumber(str) {
             width: 4000,
             kernel: sharp.kernel.lanczos3
         })
+        .composite([
+            {
+                input: "./template.png",
+                blend: "over",
+                opacity:0.25,
+                left: 1000,
+                top: 100
+            },
+            {
+                input: "./template.png",
+                blend: "over",
+                opacity:0.25,
+                left: 2000,
+                top: 100
+            }
+        ])
         .sharpen()
         .toBuffer();
 
@@ -61,30 +77,8 @@ function isValidNumber(str) {
     const result = await ocr.recognize(arrayBuffer);
     const datas = result.lines;
 
-    var cardPersonSelected;
-    var search = "Erling Haaland";
-    var baseCard = datas.filter(x => x.filter(a => a.text == search).length > 0).map(x => x.filter(a => a.text == search)[0])[0];
-
-    var positions = [];
-
-    datas.forEach(x => {
-        x.forEach(element => {
-            if (positionsPtBr.includes(element.text.toUpperCase())) {
-                positions.push(element);
-            } else if (element.text.length <= 3) {
-                if (positionsPtBr.filter(pos => element.text.toUpperCase().includes(pos)).length > 0) {
-                    positions.push(element)
-                }
-            }
-        })
-    })
-    var overhalls = datas.filter(x => x.filter(a => isValidNumber(a.text)).length > 0).map(x => x.filter(a => isValidNumber(a.text))[0]);
-
-    // console.log("base card: ", baseCard);
-    // console.log("positions", positions);
-    // console.log(datas)
-    console.log("overhalls", overhalls);
-
+    
+    console.log(datas)
 
     await ocr.destroy();
 })();

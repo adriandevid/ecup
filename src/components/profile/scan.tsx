@@ -129,20 +129,26 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
 
     const scanTeam = async () => {
         if (ocr != null && file) {
-            isLoading(true);
+            try {
+                isLoading(true);
 
-            const [result] = await ocr.predict(file);
-            var team = {
-                players: loadCardsOfTeam(result.items),
-                training: searhTraining(result.items),
-                tactical_setup: searchTaticalSetup(result.items)
-            };
+                const [result] = await ocr.predict(file);
+                
+                var team = {
+                    players: loadCardsOfTeam(result.items),
+                    training: searhTraining(result.items),
+                    tactical_setup: searchTaticalSetup(result.items)
+                };
 
-            isLoading(false);
+                isLoading(false);
 
-            setTeamData(team);
+                setTeamData(team);
 
-            setImportTeam(team);
+                setImportTeam(team);
+            } catch (ex) {
+                console.log(ex)
+                isLoading(false);
+            }
         }
     }
 
