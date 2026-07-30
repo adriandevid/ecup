@@ -38,10 +38,13 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
         "MAT", // Meio-Atacante
         "MLE", // Meio Lateral Esquerdo
         "MLD", // Meio Lateral Direito
+        "MLG",
         "PE",  // Ponta Esquerda
         "PD",  // Ponta Direita
         "SA",  // Segundo Atacante
-        "CA"   // Centroavante
+        "CA",   // Centroavante,
+        "PTE",
+        "PTD"
     ];
 
     var taticalSetupNamespaces = [
@@ -69,7 +72,7 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
 
 
     const searhTraining = (datas: ObjectTextOCR[]) => {
-        return datas.filter(x => x.text.split("-").length == 4)[0].text
+        return datas.filter(x => x.text.split("-").length >= 3)[0].text
     }
 
     const searchTaticalSetup = (datas: ObjectTextOCR[]): string => {
@@ -95,7 +98,8 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
             name: baseCard.text
         }
 
-        var heigthRowCards = datas.filter(x => (baseCard.poly[0][1] - x.poly[0][1]) > 0);
+        try {
+            var heigthRowCards = datas.filter(x => (baseCard.poly[0][1] - x.poly[0][1]) > 0);
         var heigthRowCardsAroundBaseCard = heigthRowCards.map(x => ({
             c: x,
             axisX: baseCard.poly[0][0] - x.poly[0][0],
@@ -111,6 +115,10 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
 
         card.position = positionCoordinates.c.text;
         card.overall = parseInt(overallCoordinates.c.text);
+        } catch(ex) {
+            console.log("dados", datas)
+            console.log("erro", baseCard)
+        }
 
         return card;
     }
@@ -133,12 +141,14 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
                 isLoading(true);
 
                 const [result] = await ocr.predict(file);
-                
+            
+                console.log(result.items)
                 var team = {
                     players: loadCardsOfTeam(result.items),
                     training: searhTraining(result.items),
                     tactical_setup: searchTaticalSetup(result.items)
                 };
+                console.log(team)
 
                 isLoading(false);
 
