@@ -72,24 +72,34 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
 
 
     const searhTraining = (datas: ObjectTextOCR[]) => {
-        return datas.filter(x => x.text.split("-").length >= 3)[0].text
+        try {
+            return datas.filter(x => x.text.split("-").length >= 3)[0].text
+        } catch(ex) {
+            return ""
+        }
     }
 
     const searchTaticalSetup = (datas: ObjectTextOCR[]): string => {
         var name: string = "";
 
-        datas.forEach(x => {
-            var nameSplited = x.text.split(" ");
+        try {
+            datas.forEach(x => {
+                var nameSplited = x.text.split(" ");
 
-            nameSplited.forEach(t => {
-                var search = taticalSetupNamespaces.filter(s => s.splited.includes(t));
-                if (search.length > 0) {
-                    name = search[0].title
-                }
+                nameSplited.forEach(t => {
+                    var search = taticalSetupNamespaces.filter(s => s.splited.includes(t));
+                    if (search.length > 0) {
+                        name = search[0].title
+                    }
+                })
             })
-        })
 
-        return name;
+            return name;
+        } catch (ex) {
+
+            return name;
+        }
+
     }
 
     const searchCard = (datas: ObjectTextOCR[], playerName: string) => {
@@ -100,22 +110,31 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
 
         try {
             var heigthRowCards = datas.filter(x => (baseCard.poly[0][1] - x.poly[0][1]) > 0);
-        var heigthRowCardsAroundBaseCard = heigthRowCards.map(x => ({
-            c: x,
-            axisX: baseCard.poly[0][0] - x.poly[0][0],
-            axisY: baseCard.poly[0][1] - x.poly[0][1],
-            around: (baseCard.poly[0][0] - x.poly[0][0]) + (baseCard.poly[0][1] - x.poly[0][1])
-        })).filter(x => x.axisX > 0).sort((a, b) => a.around - b.around)
 
-        var positionCoordinates = heigthRowCardsAroundBaseCard
-            .filter(x => positionsPtBr.includes(x.c.text.toUpperCase()))[0];
+            var heigthRowCardsAroundBaseCard = heigthRowCards.map(x => ({
+                c: x,
+                axisX: baseCard.poly[0][0] - x.poly[0][0],
+                axisY: baseCard.poly[0][1] - x.poly[0][1],
+                around: (baseCard.poly[0][0] - x.poly[0][0]) + (baseCard.poly[0][1] - x.poly[0][1])
+            })).filter(x => x.axisX > 0).sort((a, b) => a.around - b.around)
 
-        var overallCoordinates = heigthRowCardsAroundBaseCard
-            .filter(x => isValidNumber(x.c.text))[0];
+            var positionCoordinates = heigthRowCardsAroundBaseCard
+                .filter(x => {
+                    if (positionsPtBr.includes(x.c.text.toUpperCase())) {
+                        return true;
+                    } else if (x.c.text.length >= 2 && positionsPtBr.filter(t => x.c.text.includes(t)).length > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })[0];
 
-        card.position = positionCoordinates.c.text;
-        card.overall = parseInt(overallCoordinates.c.text);
-        } catch(ex) {
+            var overallCoordinates = heigthRowCardsAroundBaseCard
+                .filter(x => isValidNumber(x.c.text))[0];
+
+            card.position = positionCoordinates.c.text;
+            card.overall = parseInt(overallCoordinates.c.text);
+        } catch (ex) {
             console.log("dados", datas)
             console.log("erro", baseCard)
         }
@@ -141,7 +160,7 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
                 isLoading(true);
 
                 const [result] = await ocr.predict(file);
-            
+
                 console.log(result.items)
                 var team = {
                     players: loadCardsOfTeam(result.items),
