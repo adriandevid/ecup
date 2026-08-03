@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ScanTeam from "./scan";
 import { Card } from "@/types";
+import { formations } from "@/constants";
 
 export default function Profile() {
     const [openaScanModal, isOpenScanModal] = useState<boolean>(false);
@@ -12,6 +13,10 @@ export default function Profile() {
         tactical_setup: string
     } | undefined>();
     const pitchPlayersContainerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(function () {
+        console.log(team);
+    }, [team])
 
     return (
         <section id="tab-perfil" className="tab-content space-y-6">
@@ -280,300 +285,35 @@ export default function Profile() {
                         </div>
                         <div id="pitch-players-container" className="relative w-full h-full z-10" ref={pitchPlayersContainerRef}>
                             {
-                                team?.training.split("-").map((x, index) => {
-                                    if (index == 0) {
-                                        return (
-                                            <>
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase() == "LE").map(x => (
-                                                        <div
-                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                            style={{
-                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`,
-                                                                left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
-                                                            }}
-                                                        >
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
+                                team &&
+                                formations.filter(x => x.name == team?.training)[0].positions.map(x => {
+                                    var players = team.players.filter(p => x.includes(p.name))
+                                    return (
+                                        <>
+                                            {/* {
+                                                x.map(p => (
+                                                    <div
+                                                        className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
+                                                        style={{
+                                                            bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`,
+                                                            left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
+                                                        }}
+                                                    >
+                                                        <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
+                                                            <span>{x.overall}</span>
+                                                            <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
+                                                                {x.position}
+                                                            </span>
                                                         </div>
-                                                    ))
-                                                }
-
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase().includes("ZC")).map((x, i) => (
-                                                        <div
-                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                            style={{
-                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`,
-                                                                left: `${i == 0 ?
-                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) :
-                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
-                                                                    }px`
-                                                            }}
-                                                        >
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
+                                                        <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
+                                                            {x.name}
                                                         </div>
-                                                    ))
-                                                }
-
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase() == "LD").map(x => (
-                                                        <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.8)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-                                            </>
-                                        )
-                                    } else if (index == 1) {
-                                        return (
-                                            <>
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase() == "MLG" || y.position?.toUpperCase() == "VOL").map((x, i) => (
-                                                        <div
-                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                            style={{
-                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.6)}px`,
-                                                                left: `${i == 0 ?
-                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) :
-                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
-                                                                    }px`
-                                                            }}
-                                                        >
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-                                            </>
-                                        )
-                                    } else if (index == 2) {
-                                        if (team?.training.split("-").length == 4) {
-                                            return (
-                                                <>
-                                                    {
-                                                        team.players.filter(y => y.position?.toUpperCase() == "MLE").map(x => (
-                                                            <div
-                                                                className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                                style={{
-                                                                    bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.4)}px`,
-                                                                    left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
-                                                                }}
-                                                            >
-                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                    <span>{x.overall}</span>
-                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                        {x.position}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                    {x.name}
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                    {
-                                                        team.players.filter(y => y.position?.toUpperCase() == "MLD").map(x => (
-                                                            <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.4)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
-                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                    <span>{x.overall}</span>
-                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                        {x.position}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                    {x.name}
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                </>
-                                            )
-                                        } else {
-                                            return (
-                                                <>
-                                                    {
-                                                        team.players.filter(y => y.position?.toUpperCase() == "PTE").map(x => (
-                                                            <div
-                                                                className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                                style={{
-                                                                    bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
-                                                                    left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
-                                                                }}
-                                                            >
-                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                    <span>{x.overall}</span>
-                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                        {x.position}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                    {x.name}
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    }
-
-                                                    {
-                                                        team.players.filter(y => y.position?.toUpperCase() == "CA" || y.position?.toUpperCase() == "SA").map((x, i) => (
-                                                            <div
-                                                                className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                                style={{
-                                                                    bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
-                                                                    left: `${i == 0 ?
-                                                                        (pitchPlayersContainerRef.current!.offsetWidth / 3) :
-                                                                        (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
-                                                                        }px`
-                                                                }}
-                                                            >
-                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                    <span>{x.overall}</span>
-                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                        {x.position}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                    {x.name}
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    }
-
-                                                    {
-                                                        team.players.filter(y => y.position?.toUpperCase() == "PTD").map(x => (
-                                                            <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
-                                                                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                    <span>{x.overall}</span>
-                                                                    <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                        {x.position}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                    {x.name}
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                </>
-                                            )
-                                        }
-                                    } else {
-                                        return (
-                                            <>
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase() == "PTE").map(x => (
-                                                        <div
-                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                            style={{
-                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
-                                                                left: `${(pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5}px`
-                                                            }}
-                                                        >
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase() == "CA" || y.position?.toUpperCase() == "SA").map((x, i) => (
-                                                        <div
-                                                            className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin"
-                                                            style={{
-                                                                bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`,
-                                                                left: `${i == 0 ?
-                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) :
-                                                                    (pitchPlayersContainerRef.current!.offsetWidth / 3) + ((pitchPlayersContainerRef.current!.offsetWidth / 3) / team.players.filter(e => e.position == "ZC").length)
-                                                                    }px`
-                                                            }}
-                                                        >
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-
-                                                {
-                                                    team.players.filter(y => y.position?.toUpperCase() == "PTD").map(x => (
-                                                        <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: `${pitchPlayersContainerRef.current!.offsetHeight - (pitchPlayersContainerRef.current!.offsetHeight * 0.2)}px`, left: `${((pitchPlayersContainerRef.current!.offsetWidth / 3) * 3) - ((pitchPlayersContainerRef.current!.offsetWidth / 3) * 0.5)}px` }}>
-                                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                                <span>{x.overall}</span>
-                                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                                    {x.position}
-                                                                </span>
-                                                            </div>
-                                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                                {x.name}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-                                            </>
-                                        )
-                                    }
+                                                    </div>
+                                                ))
+                                            } */}
+                                        </>
+                                    )
                                 })
-                            }
-
-                            {
-                                team && (
-                                    team.players.filter(x => ["GO"].includes(`${x.position?.toUpperCase()}`)).map(def => (
-                                        <div className="absolute cursor-pointer -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group player-pin" style={{ bottom: '0%', left: '50%' }}>
-                                            <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900 border-2 border-emerald-400 shadow-lg text-emerald-400 font-extrabold text-xs sm:text-sm group-hover:bg-emerald-500 group-hover:text-slate-950 transition">
-                                                <span>{def.overall}</span>
-                                                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-600 rounded text-[9px] font-bold">
-                                                    {def.position}
-                                                </span>
-                                            </div>
-                                            <div className="mt-1 px-2 py-0.5 bg-slate-950/90 text-white text-[10px] sm:text-xs font-semibold rounded border border-slate-700/80 whitespace-nowrap shadow-md">
-                                                {def.name}
-                                            </div>
-                                        </div>
-                                    ))
-                                )
                             }
                         </div>
                     </div>

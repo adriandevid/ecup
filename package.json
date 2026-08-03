@@ -13,6 +13,7 @@
     "disableAutoBuild": "1"
   },
   "dependencies": {
+    "@imgly/background-removal-node": "^1.4.5",
     "@paddleocr/paddleocr-js": "^0.4.2",
     "@techstark/opencv-js": "^5.0.0-release.1",
     "@vercel/analytics": "^2.0.1",
@@ -30,6 +31,7 @@
     "ppu-paddle-ocr": "^6.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-easy-crop": "^6.2.3",
     "resend": "^6.17.2",
     "sharp": "^0.35.3",
     "socket.io": "^4.8.3",

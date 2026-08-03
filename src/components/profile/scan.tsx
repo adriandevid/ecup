@@ -1,8 +1,10 @@
 'use client';
 
+import { getCroppedImg } from "@/lib/cropImage";
 import { Card, ObjectTextOCR } from "@/types";
 import { PaddleOCR } from "@paddleocr/paddleocr-js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Cropper from "react-easy-crop";
 
 function isValidNumber(str: string) {
     return typeof str === 'string' && str.trim() !== '' && Number.isFinite(Number(str));
@@ -26,6 +28,16 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
             training: string
             tactical_setup: string
         }>();
+
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const [croppedImage, setCroppedImage] = useState<string | null>(null);
+    const [image, setImage] = useState<string | null>(null);
+
+    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
 
     const positionsPtBr = [
         "GOL", // Goleiro
@@ -74,7 +86,7 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
     const searhTraining = (datas: ObjectTextOCR[]) => {
         try {
             return datas.filter(x => x.text.split("-").length >= 3)[0].text
-        } catch(ex) {
+        } catch (ex) {
             return ""
         }
     }
@@ -152,32 +164,53 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
     const handleImage = async (e: any) => {
         setFile(e.target.files[0]);
         setFileBase64(await fileToBase64(e.target.files[0]));
+        setImage(await fileToBase64(e.target.files[0]));
     };
 
     const scanTeam = async () => {
-        if (ocr != null && file) {
+        if (ocr != null && image) {
             try {
                 isLoading(true);
 
-                const [result] = await ocr.predict(file);
+                const [result] = await ocr.predict(await getCroppedImg(image, croppedAreaPixels));
 
-                console.log(result.items)
                 var team = {
                     players: loadCardsOfTeam(result.items),
                     training: searhTraining(result.items),
                     tactical_setup: searchTaticalSetup(result.items)
                 };
-                console.log(team)
 
                 isLoading(false);
 
-                setTeamData(team);
+                if (teamDatas) {
+                    var players: Card[] = [];
 
-                setImportTeam(team);
+                    teamDatas.players.forEach(x => {
+                        var player = team.players.filter(p => p.name == x.name)[0];
+                        if (player) {
+                            players.push(player);
+                        } else {
+                            players.push(x);
+                        }
+                    });
+
+                    setTeamData({
+                        training: team.training == "" ? teamDatas.training : team.training,
+                        tactical_setup: team.training == "" ? teamDatas.tactical_setup : team.tactical_setup,
+                        players: players
+                    });
+                } else {
+                    setTeamData(team);
+                }
             } catch (ex) {
-                console.log(ex)
                 isLoading(false);
             }
+        }
+    }
+
+    const confirmTeam = () => {
+        if (teamDatas) {
+            setImportTeam(teamDatas);
         }
     }
 
@@ -194,11 +227,25 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
         batch_size: 6
   `;
 
+    const clean = () => {
+        setTeamData(undefined);
+        setFile(undefined);
+        setFileBase64(undefined);
+        setCroppedAreaPixels(null);
+        setCroppedImage(null);
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
+    }
+
     useEffect(() => {
         if (openModal) {
             setTeamData(undefined);
             setFile(undefined);
             setFileBase64(undefined);
+            setCroppedAreaPixels(null);
+            setCroppedImage(null);
+            setCrop({ x: 0, y: 0 });
+            setZoom(1);
         }
 
         if (ocr == null && openModal) {
@@ -276,41 +323,59 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
 
 
                 <div className="p-6 space-y-6">
-
-
                     <div id="upload-zone" className="border-2 border-dashed border-slate-700 hover:border-emerald-500/70 bg-[#080d18]/60 rounded-xl p-8 text-center cursor-pointer transition group relative overflow-hidden">
-
-
                         {
-                            fileBase64 && (
-                                <div id="scan-preview-wrapper" className="relative w-full h-64 rounded-lg overflow-hidden bg-black flex items-center justify-center">
-                                    {
-                                        loading && (
-                                            <div id="scan-laser-bar" className="scan-laser"></div>
-                                        )
-                                    }
-                                    <img id="scan-preview-img" src={fileBase64} alt="Escalação para escaneamento" className="w-full h-full object-contain" />
-
-                                    {
-                                        loading && (
-                                            <div id="scan-overlay-boxes" className="absolute inset-0 pointer-events-none">
-                                                <div className="absolute top-1/4 left-1/4 w-32 h-12 border-2 border-emerald-400 bg-emerald-500/20 rounded animate-pulse"></div>
-                                                <div className="absolute top-1/2 left-1/3 w-28 h-10 border-2 border-emerald-400 bg-emerald-500/20 rounded animate-pulse"></div>
-                                                <div className="absolute bottom-1/4 right-1/4 w-36 h-12 border-2 border-emerald-400 bg-emerald-500/20 rounded animate-pulse"></div>
-                                            </div>
-                                        )
-                                    }
-                                </div>
+                            file && (
+                                <button onClick={() => clean()} className="absolute top-2 left-2 shadow-md z-10 bg-red-500 px-4 py-3 rounded-full"><i className="fa fa-trash"></i></button>
                             )
                         }
 
+                        {file && (
+                            <div className="relative w-full h-64 bg-neutral-800">
+                                {
+                                    loading && (
+                                        <div id="scan-laser-bar" className="scan-laser"></div>
+                                    )
+                                }
 
+                                <Cropper
+                                    image={fileBase64}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    aspect={4 / 3} // Change to your desired ratio (e.g. 1 for square)
+                                    onCropChange={setCrop}
+                                    onCropComplete={onCropComplete}
+                                    onZoomChange={setZoom}
+                                />
+
+                                {
+                                    loading && (
+                                        <div id="scan-overlay-boxes" className="absolute inset-0 pointer-events-none">
+                                            <div className="absolute top-1/4 left-1/4 w-32 h-12 border-2 border-emerald-400 bg-emerald-500/20 rounded animate-pulse"></div>
+                                            <div className="absolute top-1/2 left-1/3 w-28 h-10 border-2 border-emerald-400 bg-emerald-500/20 rounded animate-pulse"></div>
+                                            <div className="absolute bottom-1/4 right-1/4 w-36 h-12 border-2 border-emerald-400 bg-emerald-500/20 rounded animate-pulse"></div>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        )}
+                        {/* {
+                            (fileBase64 && croppedImage == undefined) && (
+                                <div id="scan-preview-wrapper" className="relative w-full h-64 rounded-lg overflow-hidden bg-black flex items-center justify-center">
+                                    
+                                    <img id="scan-preview-img" src={fileBase64} alt="Escalação para escaneamento" className="w-full h-full object-contain" />
+
+
+                                </div>
+                            )
+                        } */}
                         {
-                            (fileBase64 == undefined) && (
+                            (fileBase64 == undefined && croppedImage == undefined) && (
                                 <>
-                                    <div id="upload-placeholder" className="space-y-3 py-4" onClick={() => {
+                                    <div id="upload-placeholder" className="relative space-y-3 py-4" onClick={() => {
                                         document.getElementById('file-input-scanner')?.click()
                                     }}>
+
                                         <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-800/80 group-hover:bg-emerald-950/80 group-hover:text-emerald-400 text-slate-400 flex items-center justify-center text-2xl transition">
                                             <i className="fa-solid fa-cloud-arrow-up"></i>
                                         </div>
@@ -328,6 +393,20 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
                             )
                         }
                     </div>
+                    {file && (
+                        <div className="flex flex-col gap-2 w-full max-w-xs">
+                            <label>Zoom</label>
+                            <input
+                                type="range"
+                                value={zoom}
+                                min={1}
+                                max={4}
+                                step={0.1}
+                                aria-labelledby="Zoom"
+                                onChange={(e) => setZoom(Number(e.target.value))}
+                            />
+                        </div>
+                    )}
 
                     <div id="scan-status-container" className="space-y-2 hidden">
                         <div className="flex items-center justify-between text-xs">
@@ -342,13 +421,17 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
                     {
                         teamDatas && (
                             <div className="space-y-3">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between flex-row gap-4">
                                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
                                         <i className="fa-solid fa-list-check text-emerald-400"></i> Atletas Identificados (<span id="val-player-count">{teamDatas.players.length}</span>)
                                     </label>
-                                    {/* <button onclick="addValidationRow()" className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold text-xs border border-emerald-500/30 flex items-center gap-1.5 transition">
-                                <i className="fa-solid fa-plus text-xs"></i> Adicionar Atleta
-                            </button> */}
+                                    {
+                                        teamDatas.training != "" && (
+                                            <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                                <i className="fa fa-link text-emerald-400"></i> Esquema Encontrado: <input className=" bg-[#0b1326] py-2 pl-2 text-emerald-600 rounded-lg" defaultValue={teamDatas.training}></input>
+                                            </label>
+                                        )
+                                    }
                                 </div>
                                 <div className="overflow-x-auto bg-[#080d18] border border-slate-800 rounded-xl max-h-60 overflow-y-auto">
                                     <table className="w-full text-left border-collapse text-xs">
@@ -367,7 +450,9 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
                                                             <input defaultValue={x.name} type="text" value={x.name} className="w-full bg-[#0f172a] border border-slate-700/80 rounded px-2 py-1 text-xs text-white focus:border-emerald-500 focus:outline-none font-semibold" />
                                                         </td>
                                                         <td className="py-2 px-2">
-                                                            <select value={x.position?.toUpperCase()} className="w-full bg-[#0f172a] border border-slate-700/80 rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none">
+                                                            <select onChange={(e) => {
+                                                                teamDatas.players.filter(p => p.name == x.name)[0].position = e.target.value;
+                                                            }} defaultValue={x.position?.toUpperCase()} className="w-full bg-[#0f172a] border border-slate-700/80 rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none">
                                                                 {
                                                                     positionsPtBr.map((x, i) => (
                                                                         <option value={x} key={i}>{x}</option>
@@ -394,36 +479,38 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
                     <button onClick={() => isOpenModal(false)} className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
                         Cancelar
                     </button>
-                    <button id="btn-start-scan" onClick={scanTeam} className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 text-slate-950 flex items-center gap-2 transition shadow-lg shadow-emerald-600/20 text-white" disabled={loading}>
+                    <div className="flex flex-row gap-10">
+                        <button id="btn-start-scan" onClick={scanTeam} className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 text-slate-950 flex items-center gap-2 transition shadow-lg shadow-emerald-600/20 text-white" disabled={loading}>
+                            {
+                                loading ?
+                                    <>
+                                        <i className="fa-solid fa-circle-notch fa-spin" />
+                                        Processando Importação ...
+                                    </> :
+                                    <>
+                                        <i className="fa-solid fa-wand-magic-sparkles"></i>
+                                        Processar e Importar
+                                    </>
+                            }
+                        </button>
                         {
-                            loading ?
-                                <>
-                                    <i className="fa-solid fa-circle-notch fa-spin" />
-                                    Processando Importação ...
-                                </> :
-                                <>
-                                    <i className="fa-solid fa-wand-magic-sparkles"></i>
-                                    Processar e Importar
-                                </>
+                            teamDatas && (
+                                <button id="btn-start-scan" className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 text-slate-950 flex items-center gap-2 transition shadow-lg shadow-emerald-600/20 text-white" disabled={loading} onClick={confirmTeam}>
+                                    {
+                                        loading ?
+                                            <>
+                                                <i className="fa-solid fa-circle-notch fa-spin" />
+                                                Processando ...
+                                            </> :
+                                            <>
+                                                <i className="fa-solid fa-check"></i>
+                                                Confirmar Time
+                                            </>
+                                    }
+                                </button>
+                            )
                         }
-                    </button>
-                    {
-                        teamDatas && (
-                            <button id="btn-start-scan" className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 text-slate-950 flex items-center gap-2 transition shadow-lg shadow-emerald-600/20 text-white" disabled={loading}>
-                                {
-                                    loading ?
-                                        <>
-                                            <i className="fa-solid fa-circle-notch fa-spin" />
-                                            Processando ...
-                                        </> :
-                                        <>
-                                            <i className="fa-solid fa-check"></i>
-                                            Confirmar Time
-                                        </>
-                                }
-                            </button>
-                        )
-                    }
+                    </div>
                 </div>
 
             </div>
