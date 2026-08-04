@@ -27,21 +27,70 @@ export default function Profile() {
 
     const [showTrainingCreateModal, isShowTrainingCreateModal] = useState<boolean>(false);
 
-    const SelectPosition = () => (
-        <select className="w-full bg-[#0f172a] border border-white rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none">
-            {
-                positionsPtBr.map((x, i) => (
-                    <option value={x} key={i}>{x}</option>
-                ))
-            }
-        </select>
-    )
-
 
     const [taticalScheme, setTaticalScheme] = useState<{
-        line: number,
-        positions: string[]
-    }[]>();
+        line: number;
+        players_count: number;
+        positions: string[];
+    }[]>([]);
+
+
+    const [positions, setPositions] = useState<number>(3);
+
+
+    const appendPositions = () => {
+        if (positions <= 3) {
+            setPositions(positions + 1)
+        }
+    }
+
+    const removePositions = () => {
+        if (positions > 3) {
+            var taticalSchemeResult = taticalScheme.filter((x, i) => i <= 3);
+            setTaticalScheme([
+                ...taticalSchemeResult
+            ]);
+            setPositions(positions - 1)
+
+        }
+    }
+
+    const setPlayersCountInline = (line: number, players_count: number) => {
+        var lineSelected = taticalScheme.filter(x => x.line == line)[0];
+
+        if (lineSelected) {
+            var taticalSchemeResult = taticalScheme.filter(x => x.line != line);
+
+            lineSelected.players_count = players_count;
+            lineSelected.positions = Array(players_count).fill("");
+
+            taticalSchemeResult.push(lineSelected)
+
+            setTaticalScheme([
+                ...taticalSchemeResult
+            ]);
+        } else {
+            taticalScheme.push({
+                line,
+                players_count,
+                positions: Array(players_count).fill("")
+            })
+            setTaticalScheme([
+                ...taticalScheme
+            ]);
+        }
+    }
+
+
+    const setPlayersPositionsInLine = (line: number, index: number, position: string) => {
+        var lineSelected = taticalScheme.filter(x => x.line == line)[0];
+        if (lineSelected) {
+            var taticalSchemeResult = taticalScheme.filter(x => x.line != line);
+            lineSelected.positions[index] = position;
+            taticalSchemeResult.push(lineSelected);
+            setTaticalScheme(taticalSchemeResult);
+        }
+    }
 
     return (
         <section id="tab-perfil" className="tab-content space-y-6">
@@ -411,7 +460,7 @@ export default function Profile() {
             <ScanTeam openModal={openaScanModal} isOpenModal={isOpenScanModal} setImportTeam={setImportTeam}></ScanTeam>
 
             <div id="createSchemeModal" className={cn("fixed  inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity p-4", showTrainingCreateModal ? "" : "hidden")}>
-                <div className="bg-cardBg border border-cardBorder rounded-2xl p-5 max-w-xl w-full shadow-2xl space-y-4 transform transition-transform" id="schemeModalBox">
+                <div className="bg-cardBg border border-cardBorder rounded-2xl p-5 max-w-2xl w-full shadow-2xl space-y-4 transform transition-transform" id="schemeModalBox">
                     <div className="flex justify-between items-start border-b border-slate-800 pb-3">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-lg">
@@ -436,69 +485,56 @@ export default function Profile() {
                     </div>
                     <div className="flex flex-col">
                         <div className="flex flex-row items-center">
-                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
-                            <span className="w-20 h-[1px] bg-white"></span>
-                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
-                            <span className="w-20 h-[1px] bg-white"></span>
-                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
-                            <span className="w-20 h-[1px] bg-white"></span>
-                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
-                            <span className="w-20 h-[1px] bg-white"></span>
-                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
-                            <button className="bg-emerald-400 w-[2rem] h-[2rem] rounded-lg ml-1"><i className="fa fa-add"></i></button>
-                            <button className="bg-red-400 w-[2rem] h-[2rem] rounded-lg ml-1"><i className="fa fa-minus"></i></button>
+                            {
+                                Array(positions).fill(0).map((x, index) => (
+                                    <>
+                                        <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" onChange={(e) => {
+                                            if (e.target.value) {
+                                                setPlayersCountInline(index, parseInt(e.target.value))
+                                            }
+                                        }} />
+                                        <span className="w-20 h-[1px] bg-white"></span>
+                                    </>
+                                ))
+                            }
+
+                            {
+                                positions <= 3 && (
+                                    <button className="bg-emerald-400 w-[2rem] h-[2rem] rounded-lg ml-1" onClick={appendPositions}><i className="fa fa-add"></i></button>
+                                )
+                            }
+
+                            {
+                                positions > 3 && (
+                                    <button className="bg-red-400 w-[2rem] h-[2rem] rounded-lg ml-1" onClick={removePositions}><i className="fa fa-minus"></i></button>
+                                )
+                            }
                         </div>
-                        <div className="flex flex-row gap-12">
-                            <div className="flex flex-col justify-center items-start">
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                            </div>
-                            <div className="flex flex-col justify-center items-start">
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                            </div>
-                            <div className="flex flex-col justify-center items-start">
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                            </div>
-                            <div className="flex flex-col justify-center items-start">
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                            </div>
-                            <div className="flex flex-col justify-center items-start">
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                                <span className="h-10 w-[1px] bg-white"></span>
-                                <SelectPosition></SelectPosition>
-                            </div>
+                        <div className="flex flex-row gap-14">
+                            {
+                                taticalScheme.map((x, index) => {
+                                    return (
+                                        <div className={cn("flex flex-col justify-center items-start")}>
+                                            {
+                                                Array(x.players_count).fill(0).map((x, ip) => (
+                                                    <>
+                                                        <span className="h-10 w-[1px] bg-white"></span>
+                                                        <select onChange={(e) => {
+                                                            setPlayersPositionsInLine(x.line, ip, e.target.value);
+                                                        }} className="w-full bg-[#0f172a] border border-white rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none">
+                                                            {
+                                                                positionsPtBr.map((x, i) => (
+                                                                    <option value={x} key={i}>{x}</option>
+                                                                ))
+                                                            }
+                                                        </select>
+                                                    </>
+                                                ))
+                                            }
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
                     </div>
                     <div className="bg-slate-900/60 border border-slate-800 p-3 rounded-xl flex items-start gap-2.5 text-xs text-slate-400">
