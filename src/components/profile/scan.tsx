@@ -1,5 +1,6 @@
 'use client';
 
+import { positionsPtBr } from "@/constants";
 import { getCroppedImg } from "@/lib/cropImage";
 import { Card, ObjectTextOCR } from "@/types";
 import { PaddleOCR } from "@paddleocr/paddleocr-js";
@@ -39,25 +40,7 @@ export default function ScanTeam({ openModal, isOpenModal, setImportTeam }: {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 
-    const positionsPtBr = [
-        "GOL", // Goleiro
-        "GO",
-        "ZC",  // Zagueiro Central
-        "LE",  // Lateral Esquerdo
-        "LD",  // Lateral Direito
-        "VOL", // Volante
-        "MC",  // Meio-Campista
-        "MAT", // Meio-Atacante
-        "MLE", // Meio Lateral Esquerdo
-        "MLD", // Meio Lateral Direito
-        "MLG",
-        "PE",  // Ponta Esquerda
-        "PD",  // Ponta Direita
-        "SA",  // Segundo Atacante
-        "CA",   // Centroavante,
-        "PTE",
-        "PTD"
-    ];
+    
 
     var taticalSetupNamespaces = [
         {

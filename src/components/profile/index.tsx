@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ScanTeam from "./scan";
 import { Card } from "@/types";
-import { formations } from "@/constants";
+import { formations, positionsPtBr } from "@/constants";
 import { cn } from "@/lib/tailwindcss";
 
 export default function Profile() {
@@ -26,6 +26,22 @@ export default function Profile() {
     }, [team])
 
     const [showTrainingCreateModal, isShowTrainingCreateModal] = useState<boolean>(false);
+
+    const SelectPosition = () => (
+        <select className="w-full bg-[#0f172a] border border-white rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:border-emerald-500 focus:outline-none">
+            {
+                positionsPtBr.map((x, i) => (
+                    <option value={x} key={i}>{x}</option>
+                ))
+            }
+        </select>
+    )
+
+
+    const [taticalScheme, setTaticalScheme] = useState<{
+        line: number,
+        positions: string[]
+    }[]>();
 
     return (
         <section id="tab-perfil" className="tab-content space-y-6">
@@ -395,7 +411,7 @@ export default function Profile() {
             <ScanTeam openModal={openaScanModal} isOpenModal={isOpenScanModal} setImportTeam={setImportTeam}></ScanTeam>
 
             <div id="createSchemeModal" className={cn("fixed  inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity p-4", showTrainingCreateModal ? "" : "hidden")}>
-                <div className="bg-cardBg border border-cardBorder rounded-2xl p-5 max-w-md w-full shadow-2xl space-y-4 transform transition-transform" id="schemeModalBox">
+                <div className="bg-cardBg border border-cardBorder rounded-2xl p-5 max-w-xl w-full shadow-2xl space-y-4 transform transition-transform" id="schemeModalBox">
                     <div className="flex justify-between items-start border-b border-slate-800 pb-3">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-lg">
@@ -406,19 +422,85 @@ export default function Profile() {
                                 <p className="text-xs text-slate-400">Salve as posições atuais do campo como um novo esquema.</p>
                             </div>
                         </div>
-                        <button id="btnCloseSchemeModal" className="text-slate-400 hover:text-white p-1">
+                        <button id="btnCloseSchemeModal" onClick={() => { isShowTrainingCreateModal(false) }} className="text-slate-400 hover:text-white p-1">
                             <i className="fa-solid fa-xmark text-lg"></i>
                         </button>
                     </div>
-                    <div>
+                    {/* <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">Nome do Esquema (ex: 4-1-4-1, 3-2-2-3)</label>
                         <input type="text" id="newSchemeName" placeholder="Ex: 4-1-4-1 Ofensivo" className="w-full bg-slate-900 text-white font-medium text-sm p-2.5 rounded-xl border border-slate-700 focus:border-emerald-500 outline-none" />
-                    </div>
+                    </div> */}
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5">Descrição Tática</label>
                         <textarea id="newSchemeDesc" rows={2} placeholder="Ex: Linha de 4 meias e 1 volante fixo cobrindo a zaga..." className="w-full bg-slate-900 text-white text-xs p-2.5 rounded-xl border border-slate-700 focus:border-emerald-500 outline-none resize-none"></textarea>
                     </div>
-
+                    <div className="flex flex-col">
+                        <div className="flex flex-row items-center">
+                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
+                            <span className="w-20 h-[1px] bg-white"></span>
+                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
+                            <span className="w-20 h-[1px] bg-white"></span>
+                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
+                            <span className="w-20 h-[1px] bg-white"></span>
+                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
+                            <span className="w-20 h-[1px] bg-white"></span>
+                            <input type="text" className="bg-slate-900 text-white border border-white rounded-lg w-10 text-center" />
+                            <button className="bg-emerald-400 w-[2rem] h-[2rem] rounded-lg ml-1"><i className="fa fa-add"></i></button>
+                            <button className="bg-red-400 w-[2rem] h-[2rem] rounded-lg ml-1"><i className="fa fa-minus"></i></button>
+                        </div>
+                        <div className="flex flex-row gap-12">
+                            <div className="flex flex-col justify-center items-start">
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                            </div>
+                            <div className="flex flex-col justify-center items-start">
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                            </div>
+                            <div className="flex flex-col justify-center items-start">
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                            </div>
+                            <div className="flex flex-col justify-center items-start">
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                            </div>
+                            <div className="flex flex-col justify-center items-start">
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                                <span className="h-10 w-[1px] bg-white"></span>
+                                <SelectPosition></SelectPosition>
+                            </div>
+                        </div>
+                    </div>
                     <div className="bg-slate-900/60 border border-slate-800 p-3 rounded-xl flex items-start gap-2.5 text-xs text-slate-400">
                         <i className="fa-solid fa-circle-info text-emerald-400 mt-0.5"></i>
                         <span>As 11 posições (X, Y) e funções táticas atualmente no relvado serão gravadas como padrão para este novo esquema.</span>
@@ -427,7 +509,7 @@ export default function Profile() {
                         <button id="btnSaveNewScheme" className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 text-white">
                             <i className="fa-solid fa-floppy-disk"></i> Salvar Esquema
                         </button>
-                        <button id="btnCancelSchemeModal" className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl text-xs font-medium transition">
+                        <button onClick={() => { isShowTrainingCreateModal(false) }} id="btnCancelSchemeModal" className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl text-xs font-medium transition">
                             Cancelar
                         </button>
                     </div>

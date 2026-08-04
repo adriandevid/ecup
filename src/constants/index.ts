@@ -189,3 +189,23 @@ export const formations = [
     ]
   }
 ];
+
+export const positionsPtBr = [
+        "GOL", // Goleiro
+        "GO",
+        "ZC",  // Zagueiro Central
+        "LE",  // Lateral Esquerdo
+        "LD",  // Lateral Direito
+        "VOL", // Volante
+        "MC",  // Meio-Campista
+        "MAT", // Meio-Atacante
+        "MLE", // Meio Lateral Esquerdo
+        "MLD", // Meio Lateral Direito
+        "MLG",
+        "PE",  // Ponta Esquerda
+        "PD",  // Ponta Direita
+        "SA",  // Segundo Atacante
+        "CA",   // Centroavante,
+        "PTE",
+        "PTD"
+    ];
