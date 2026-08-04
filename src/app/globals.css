@@ -111,6 +111,16 @@ body {
   }
 }
 
+ .pitch-stripes {
+            background: repeating-linear-gradient(
+                0deg,
+                #0c2b18,
+                #0c2b18 40px,
+                #0f331d 40px,
+                #0f331d 80px
+            );
+        }
+
 .trophy-card {
   animation: popIn 0.4s ease-out forwards;
 }
@@ -153,6 +163,9 @@ body {
         .player-pin:hover {
             transform: translate(-50%, -50%) scale(1.12);
             z-index: 30;
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
         }
 
 /* Pulsação para troféus em disputa */

@@ -15,7 +15,7 @@ export const formations = [
       ["GO"],
       ["LE", "ZC", "ZC", "LD"],
       ["VOL", "MC", "MAT"],
-      ["PE", "CA", "PD"]
+      ["PTE", "CA", "PTD"]
     ]
   },
 
@@ -25,8 +25,19 @@ export const formations = [
       ["GO"],
       ["LE", "ZC", "ZC", "LD"],
       ["VOL", "VOL"],
-      ["PE", "MAT", "PD"],
+      ["PTE", "MAT", "PTD"],
       ["CA"]
+    ]
+  },
+
+   {
+    name: "4-2-1-3",
+    positions: [
+      ["GO"],
+      ["LE", "ZC", "ZC", "LD"],
+      ["VOL", "VOL"],
+      ["MAT"],
+      ["PTE", "CA", "PTD"],
     ]
   },
 
@@ -79,7 +90,7 @@ export const formations = [
       ["GO"],
       ["ZC", "ZC", "ZC"],
       ["MLE", "VOL", "MC", "MLD"],
-      ["PE", "CA", "PD"]
+      ["PTE", "CA", "PTD"]
     ]
   },
 
@@ -131,7 +142,7 @@ export const formations = [
       ["GO"],
       ["LE", "ZC", "ZC", "ZC", "LD"],
       ["VOL", "MC"],
-      ["PE", "CA", "PD"]
+      ["PTE", "CA", "PTD"]
     ]
   },
 
@@ -152,8 +163,8 @@ export const formations = [
       ["GO"],
       ["LE", "ZC", "ZC", "LD"],
       ["VOL", "VOL"],
-      ["MAT", "MAT"],
-      ["SA", "CA"]
+      ["MLE", "MLD"],
+      ["CA", "CA"]
     ]
   },
 
@@ -163,7 +174,18 @@ export const formations = [
       ["GO"],
       ["LE", "ZC", "ZC", "LD"],
       ["VOL", "MC"],
-      ["PE", "CA", "CA", "PD"]
+      ["PTE", "CA", "CA", "PTD"]
+    ]
+  },
+
+  {
+    name: "4-3-2-1",
+    positions: [
+      ["GO"],
+      ["LE", "ZC", "ZC", "LD"],
+      ["MLG", "VOL", "MLG"],
+      ["MAT", "MAT"],
+      ["CA"]
     ]
   }
 ];
